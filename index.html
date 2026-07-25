@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Builder — Innoverse AMU</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@700;800;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF.js for client-side PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+<body>
+
+    <!-- AI Generating Popup -->
+    <div class="ai-generating-popup" id="aiGeneratingPopup">
+        <i class="fas fa-sparkles"></i>
+        <span>AI is writing for you...</span>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         NAVBAR
+    ═══════════════════════════════════════ -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo"><i class="fas fa-file-signature"></i></div>
+            <span class="nav-title">AI Resume Builder</span>
+        </div>
+        <div class="nav-center-links">
+            <a href="#hero" class="nav-link">Home</a>
+            <a href="#builder" class="nav-link">Builder</a>
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+        </div>
+        <div class="nav-right">
+            <div class="nav-badge-wrap">
+                <span class="nav-badge-innoverse">Innoverse</span>
+                <span class="nav-badge-amu">AMU</span>
+            </div>
+            <a href="#builder" class="btn btn-nav">
+                <i class="fas fa-magic"></i> Build Resume
+            </a>
+            <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#hero" class="mobile-link"><i class="fas fa-home"></i> Home</a>
+        <a href="#how-it-works" class="mobile-link"><i class="fas fa-list-ol"></i> How It Works</a>
+        <a href="#builder" class="mobile-link"><i class="fas fa-magic"></i> Build Resume</a>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         HERO SECTION
+    ═══════════════════════════════════════ -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <div class="hero-blob blob-1"></div>
+            <div class="hero-blob blob-2"></div>
+            <div class="hero-blob blob-3"></div>
+            <div class="hero-grid"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-left">
+                <div class="hero-badge">
+                    <i class="fas fa-sparkles"></i>
+                    AI-Powered Career Platform by Innoverse AMU
+                </div>
+                <h1 class="hero-title">
+                    Build Your Dream<br>
+                    <span class="gradient-text">Career Resume</span><br>
+                    with AI
+                </h1>
+                <p class="hero-desc">
+                    Upload your existing resume for instant ATS analysis &amp; skill gap detection, or generate a stunning new one from scratch — powered by advanced AI and 12+ premium templates.
+                </p>
+                <div class="hero-cta">
+                    <a href="#builder" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket"></i> Get Started Free
+                    </a>
+                    <a href="#how-it-works" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-play-circle"></i> See How It Works
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-num">12+</span>
+                        <span class="stat-label">Premium Templates</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num">AI</span>
+                        <span class="stat-label">Skill Gap Analysis</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num">ATS</span>
+                        <span class="stat-label">Optimized Output</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-right">
+                <div class="hero-card animate-float">
+                    <div class="hero-card::before"></div>
+                    <div class="hero-card-header">
+                        <div class="hero-card-avatar">AT</div>
+                        <div class="hero-card-info">
+                            <div class="line"></div>
+                            <div class="line short"></div>
+                        </div>
+                    </div>
+                    <div class="hero-card-body">
+                        <div class="line"></div>
+                        <div class="line short"></div>
+                        <div class="line"></div>
+                        <div class="line xshort"></div>
+                    </div>
+                    <div class="hero-card-footer">
+                        <span class="badge-ats"><i class="fas fa-check-circle"></i> ATS Score: 94%</span>
+                        <span class="badge-skill"><i class="fas fa-bolt"></i> AI Enhanced</span>
+                    </div>
+                </div>
+                <div class="floating-elements">
+                    <div class="float-tag tag-1"><i class="fas fa-star"></i> ATS Optimized</div>
+                    <div class="float-tag tag-2"><i class="fas fa-brain"></i> AI Powered</div>
+                    <div class="float-tag tag-3"><i class="fas fa-chart-line"></i> Skill Analysis</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         HOW IT WORKS
+    ═══════════════════════════════════════ -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-header">
+            <span class="section-badge">SIMPLE PROCESS</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-desc">Two powerful paths to your perfect resume — upload &amp; optimize, or create from scratch.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card glass hover-lift">
+                <div class="step-number">01</div>
+                <div class="step-icon"><i class="fas fa-route"></i></div>
+                <h3>Choose Your Path</h3>
+                <p>Upload your existing PDF resume for AI analysis, or start fresh with our intelligent form wizard.</p>
+            </div>
+            <div class="step-card glass hover-lift">
+                <div class="step-number">02</div>
+                <div class="step-icon"><i class="fas fa-search-plus"></i></div>
+                <h3>AI Skill Gap Analysis</h3>
+                <p>Our AI analyses your skills against your target role, scores your ATS match, and reveals exactly what's missing.</p>
+            </div>
+            <div class="step-card glass hover-lift">
+                <div class="step-number">03</div>
+                <div class="step-icon"><i class="fas fa-magic"></i></div>
+                <h3>Enhance &amp; Download</h3>
+                <p>Get an AI-enhanced professional resume, choose from 12+ templates, review, edit, and download in PDF.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         BUILDER SECTION
+    ═══════════════════════════════════════ -->
+    <section class="builder" id="builder" style="padding-top: 120px;">
+        <div class="builder-header">
+            <span class="section-badge">Innoverse AMU</span>
+            <h2 class="section-title">AI Professional Career Portal</h2>
+            <p class="section-desc">Upload your current resume for instant ATS audit &amp; enhancements, or generate a stunning new one from scratch.</p>
+        </div>
+
+        <!-- ──────────────────────────────────
+             INITIAL CHOICE PANEL
+        ────────────────────────────────── -->
+        <div class="choice-panel" id="choicePanel">
+            <div class="choice-grid">
+                <!-- Upload Card -->
+                <div class="choice-card hover-lift" id="choiceUpload">
+                    <div class="choice-badge-top">Most Popular</div>
+                    <div class="choice-icon"><i class="fas fa-file-pdf"></i></div>
+                    <h3>Upload PDF Resume</h3>
+                    <p>Analyse ATS score, discover skill gaps, get a personalised roadmap, then enhance your resume with AI.</p>
+                    <ul class="choice-features">
+                        <li><i class="fas fa-check"></i> Instant ATS Score</li>
+                        <li><i class="fas fa-check"></i> Skill Gap Detection</li>
+                        <li><i class="fas fa-check"></i> AI Resume Enhancement</li>
+                    </ul>
+                    <button class="btn btn-primary choice-btn">Get Started <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <!-- Scratch Card -->
+                <div class="choice-card hover-lift" id="choiceScratch">
+                    <div class="choice-badge-top scratch-badge">Create New</div>
+                    <div class="choice-icon"><i class="fas fa-pen-nib"></i></div>
+                    <h3>Create From Scratch</h3>
+                    <p>Answer a few quick questions, enter your details, select from 12+ premium layouts, and build a tailored resume.</p>
+                    <ul class="choice-features">
+                        <li><i class="fas fa-check"></i> 12+ Premium Templates</li>
+                        <li><i class="fas fa-check"></i> AI-Written Content</li>
+                        <li><i class="fas fa-check"></i> Skill Gap After Build</li>
+                    </ul>
+                    <button class="btn btn-secondary choice-btn">Get Started <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Failsafe inline script for choice buttons -->
+        <script>
+        (function() {
+            function setupChoiceButtons() {
+                var choiceUpload = document.getElementById('choiceUpload');
+                var choiceScratch = document.getElementById('choiceScratch');
+                var choicePanel = document.getElementById('choicePanel');
+                var uploadPanel = document.getElementById('uploadPanel');
+                var mainStepper = document.getElementById('mainStepper');
+
+                console.log('[FAILSAFE] Setting up choice buttons:', {
+                    choiceUpload: !!choiceUpload,
+                    choiceScratch: !!choiceScratch,
+                    choicePanel: !!choicePanel,
+                    uploadPanel: !!uploadPanel,
+                    mainStepper: !!mainStepper
+                });
+
+                if (choiceUpload) {
+                    choiceUpload.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('[FAILSAFE] Upload clicked');
+                        if (choicePanel) choicePanel.classList.add('hidden');
+                        if (uploadPanel) uploadPanel.classList.remove('hidden');
+                    };
+                }
+
+                if (choiceScratch) {
+                    choiceScratch.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('[FAILSAFE] Scratch clicked');
+                        if (typeof state !== 'undefined') {
+                            state.flow = 'scratch';
+                            state.totalSteps = 4;
+                        }
+                        if (choicePanel) choicePanel.classList.add('hidden');
+                        if (mainStepper) mainStepper.classList.remove('hidden');
+                        if (typeof goToStep === 'function') goToStep(1);
+                    };
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupChoiceButtons);
+            } else {
+                setupChoiceButtons();
+            }
+        })();
+        </script>
+
+        <!-- ──────────────────────────────────
+             UPLOAD PDF PANEL
+        ────────────────────────────────── -->
+        <div class="upload-panel glass hidden" id="uploadPanel">
+            <button class="back-to-choice" id="backToChoiceBtn"><i class="fas fa-arrow-left"></i> Back to Options</button>
+            <div class="upload-panel-header">
+                <div class="upload-panel-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div>
+                    <h3 class="wizard-title">Upload Your PDF Resume</h3>
+                    <p class="wizard-subtitle" style="padding-left:0; margin-bottom:0;">We'll extract your details, analyse skill gaps &amp; prepare AI optimizations.</p>
+                </div>
+            </div>
+
+            <div class="pdf-dropzone" id="pdfDropZone">
+                <div class="pdf-drop-animation">
+                    <i class="fas fa-file-pdf pdf-drop-icon"></i>
+                </div>
+                <p>Drag &amp; drop your PDF resume here, or <span>browse files</span></p>
+                <span class="pdf-drop-sub"><i class="fas fa-shield-alt"></i> PDF only · Max 10MB · Processed client-side</span>
+                <input type="file" id="pdfFileInput" accept=".pdf" style="display:none">
+            </div>
+
+            <div class="upload-status" id="uploadStatus" style="display:none;">
+                <div class="status-spinner"><i class="fas fa-circle-notch fa-spin"></i></div>
+                <div class="status-info">
+                    <div class="status-title" id="statusTitle">Extracting text...</div>
+                    <div class="status-desc" id="statusDesc">Reading PDF content</div>
+                </div>
+            </div>
+
+            <!-- Resume Intelligence Engine Extraction & Field Confidence Card -->
+            <div class="parsing-intelligence-card hidden" id="parsingIntelligenceCard"></div>
+
+            <!-- Manual paste fallback -->
+            <div class="manual-paste-area hidden" id="manualPasteArea">
+                <div class="manual-paste-header">
+                    <i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i>
+                    <span>Could not auto-extract your PDF. Paste your resume text below:</span>
+                </div>
+                <textarea class="inp manual-paste-textarea" id="manualPasteText" rows="10"
+                    placeholder="Paste your entire resume text here..."></textarea>
+                <button class="btn btn-primary" id="manualPasteSubmit">
+                    <i class="fas fa-arrow-right"></i> Use This Text
+                </button>
+            </div>
+        </div>
+
+        <!-- ──────────────────────────────────
+             SCRATCH FLOW STEPPER
+        ────────────────────────────────── -->
+        <div class="stepper hidden" id="mainStepper">
+            <div class="stepper-track"><div class="step-line" id="stepLine"></div></div>
+            <div class="stepper-steps">
+                <div class="step-item active" data-step="1"><div class="step-dot">1</div><span class="step-label">Quick Questions</span></div>
+                <div class="step-item" data-step="2"><div class="step-dot">2</div><span class="step-label">Personal Details</span></div>
+                <div class="step-item" data-step="3"><div class="step-dot">3</div><span class="step-label">Skills &amp; Template</span></div>
+                <div class="step-item" data-step="4"><div class="step-dot">4</div><span class="step-label">Preview &amp; Download</span></div>
+            </div>
+        </div>
+
+        <!-- Step 1: Quick Questions -->
+        <div class="wizard-step hidden" id="step1">
+            <div class="wizard-card glass">
+                <h3 class="wizard-title"><i class="fas fa-clipboard-list"></i> Quick Questions</h3>
+                <p class="wizard-subtitle">Help us tailor your resume perfectly</p>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Year of Study</label>
+                    <div class="quiz-grid" id="yearGrid">
+                        <button class="quiz-opt" data-value="1st Year">1st Year</button>
+                        <button class="quiz-opt" data-value="2nd Year">2nd Year</button>
+                        <button class="quiz-opt" data-value="3rd Year">3rd Year</button>
+                        <button class="quiz-opt" data-value="4th Year">4th Year</button>
+                        <button class="quiz-opt" data-value="5th Year">5th Year</button>
+                        <button class="quiz-opt" data-value="Graduated">Graduated</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-bullseye"></i> Purpose</label>
+                    <div class="quiz-grid" id="purposeGrid">
+                        <button class="quiz-opt" data-value="Campus Club"><i class="fas fa-users"></i><span>Campus Club</span></button>
+                        <button class="quiz-opt" data-value="Internship"><i class="fas fa-briefcase"></i><span>Internship</span></button>
+                        <button class="quiz-opt" data-value="Job"><i class="fas fa-building"></i><span>Job</span></button>
+                        <button class="quiz-opt" data-value="Academic"><i class="fas fa-graduation-cap"></i><span>Academic</span></button>
+                        <button class="quiz-opt" data-value="Freelance"><i class="fas fa-laptop-code"></i><span>Freelance</span></button>
+                    </div>
+                </div>
+                <div class="form-group hidden" id="campusClubFields">
+                    <label><i class="fas fa-layer-group"></i> Club Category</label>
+                    <div class="quiz-grid" id="clubCategoryGrid">
+                        <button class="quiz-opt" data-value="Technical"><i class="fas fa-code"></i><span>Technical</span></button>
+                        <button class="quiz-opt" data-value="Cultural"><i class="fas fa-music"></i><span>Cultural</span></button>
+                        <button class="quiz-opt" data-value="Sports"><i class="fas fa-running"></i><span>Sports</span></button>
+                        <button class="quiz-opt" data-value="Literary"><i class="fas fa-pen-fancy"></i><span>Literary</span></button>
+                        <button class="quiz-opt" data-value="Social"><i class="fas fa-hands-helping"></i><span>Social</span></button>
+                        <button class="quiz-opt" data-value="Research"><i class="fas fa-microscope"></i><span>Research</span></button>
+                    </div>
+                    <input type="hidden" id="clubCategory" value="">
+                    <label style="margin-top:20px"><i class="fas fa-flag"></i> Club Name</label>
+                    <input type="text" class="inp" id="clubName" placeholder="e.g., IEEE Student Branch">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-chart-line"></i> Experience Level</label>
+                    <div class="quiz-grid" id="expGrid">
+                        <button class="quiz-opt" data-value="Beginner"><i class="fas fa-seedling"></i><span>Beginner</span></button>
+                        <button class="quiz-opt" data-value="Intermediate"><i class="fas fa-chart-line"></i><span>Intermediate</span></button>
+                        <button class="quiz-opt" data-value="Experienced"><i class="fas fa-trophy"></i><span>Experienced</span></button>
+                    </div>
+                </div>
+                <div class="wizard-actions">
+                    <button class="btn btn-primary" id="step1Next">Continue <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Personal Details -->
+        <div class="wizard-step" id="step2">
+            <div class="wizard-card glass">
+                <h3 class="wizard-title"><i class="fas fa-user"></i> Personal Details</h3>
+                <p class="wizard-subtitle">Fill in your information</p>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-user"></i> Full Name *</label><input type="text" class="inp" id="fullName" placeholder="John Doe" required></div>
+                    <div class="form-group"><label><i class="fas fa-envelope"></i> Email *</label><input type="email" class="inp" id="email" placeholder="john@example.com" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-phone"></i> Phone *</label><input type="tel" class="inp" id="phone" placeholder="+91 98765 43210" required></div>
+                    <div class="form-group"><label><i class="fas fa-map-marker-alt"></i> Location *</label><input type="text" class="inp" id="location" placeholder="Aligarh, India" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-university"></i> College/University *</label><input type="text" class="inp" id="college" placeholder="Aligarh Muslim University" required></div>
+                    <div class="form-group"><label><i class="fas fa-graduation-cap"></i> Degree *</label><input type="text" class="inp" id="degree" placeholder="B.Tech in Computer Science" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-percent"></i> CGPA / Percentage *</label><input type="text" class="inp" id="undergradGpa" placeholder="e.g. 8.52/10" required></div>
+                    <div class="form-group"><label><i class="fas fa-calendar-check"></i> Graduation Year *</label><input type="number" class="inp" id="gradYear" placeholder="2026" min="2010" max="2035" required></div>
+                </div>
+                <h4 style="margin-top: 24px; margin-bottom: 12px; font-weight: 700; color: var(--dark); border-bottom: 1px solid var(--gray-light); padding-bottom: 8px;"><i class="fas fa-school"></i> High School &amp; Intermediate Education</h4>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-school"></i> Intermediate School Name *</label><input type="text" class="inp" id="interSchool" placeholder="e.g. DPS Aligarh" required></div>
+                    <div class="form-group"><label><i class="fas fa-percent"></i> Intermediate % or CGPA *</label><input type="text" class="inp" id="interGpa" placeholder="e.g. 92.4%" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-building"></i> Intermediate Board *</label><input type="text" class="inp" id="interBoard" placeholder="e.g. CBSE / ICSE / UP Board" required></div>
+                    <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Intermediate Year *</label><input type="number" class="inp" id="interYear" placeholder="2024" min="2010" max="2035" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-school"></i> High School (Class X) Name *</label><input type="text" class="inp" id="highSchool" placeholder="e.g. DPS Aligarh" required></div>
+                    <div class="form-group"><label><i class="fas fa-percent"></i> High School % or CGPA *</label><input type="text" class="inp" id="highGpa" placeholder="e.g. 94.6%" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-building"></i> High School Board *</label><input type="text" class="inp" id="highBoard" placeholder="e.g. CBSE / ICSE" required></div>
+                    <div class="form-group"><label><i class="fas fa-calendar-alt"></i> High School Year *</label><input type="number" class="inp" id="highYear" placeholder="2022" min="2010" max="2035" required></div>
+                </div>
+                <h4 style="margin-top: 24px; margin-bottom: 12px; font-weight: 700; color: var(--dark); border-bottom: 1px solid var(--gray-light); padding-bottom: 8px;"><i class="fas fa-link"></i> Socials &amp; Profile Details</h4>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fab fa-linkedin"></i> LinkedIn</label><input type="url" class="inp" id="linkedin" placeholder="https://linkedin.com/in/..."></div>
+                    <div class="form-group"><label><i class="fab fa-github"></i> GitHub</label><input type="url" class="inp" id="github" placeholder="https://github.com/..."></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-language"></i> Languages</label><input type="text" class="inp" id="languages" placeholder="English, Hindi, Urdu"></div>
+                    <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of Birth (Optional)</label><input type="date" class="inp" id="dob"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="grid-column: 1 / -1;"><label><i class="fas fa-info-circle"></i> Additional Info (Optional)</label><input type="text" class="inp" id="additionalInfo" placeholder="e.g. Driving License, Open to Relocation, Available for Freelance"></div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-camera"></i> Profile Photo</label>
+                    <div class="photo-upload" id="photoUpload">
+                        <div class="photo-preview" id="photoPreview">
+                            <div class="photo-initials" id="photoInitials">?</div>
+                            <img id="photoImg" src="" alt="" style="display:none;">
+                        </div>
+                        <div class="photo-actions">
+                            <input type="file" id="photoInput" accept="image/*" hidden>
+                            <button class="btn btn-secondary" id="photoBtn"><i class="fas fa-camera"></i> Upload Photo</button>
+                            <span class="photo-hint">JPG, PNG up to 5MB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary" id="step2Back"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button class="btn btn-primary" id="step2Next">Continue <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Role, Skills & Template -->
+        <div class="wizard-step" id="step3">
+            <div class="wizard-card glass">
+                <h3 class="wizard-title"><i class="fas fa-bullseye"></i> Role, Skills &amp; Template</h3>
+                <p class="wizard-subtitle">Define your target and showcase your skills</p>
+                <div class="form-group">
+                    <label><i class="fas fa-briefcase"></i> Target Role</label>
+                    <div class="input-ai-wrap">
+                        <input type="text" class="inp" id="targetRole" placeholder="e.g., Software Engineer, Club Secretary">
+                        <button class="btn-ai-write" data-field="targetRole"><i class="fas fa-magic"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tools"></i> Skills</label>
+                    <div class="skills-input-wrapper input-ai-wrap">
+                        <input type="text" class="inp" id="skillsInput" placeholder="Type a skill and press Enter (e.g., Python, React, Leadership)">
+                        <button class="btn-ai-write" data-field="skillsInput" title="Suggest Skills using AI"><i class="fas fa-magic"></i></button>
+                        <div class="skills-tags" id="skillsTags"></div>
+                    </div>
+                </div>
+                <!-- Dynamic Fields Based on Purpose -->
+                <div id="dynamicFields">
+                    <!-- Campus Club Fields -->
+                    <div class="dynamic-section hidden" id="campusFields">
+                        <div class="form-group"><label><i class="fas fa-heart"></i> Motivation to Join</label><div class="textarea-ai-wrap"><textarea class="inp" id="motivation" rows="3" placeholder="Why do you want to join this club?"></textarea><button class="btn-ai-write" data-field="motivation"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-project-diagram"></i> Relevant Projects</label><div class="textarea-ai-wrap"><textarea class="inp" id="relevantProjects" rows="3" placeholder="List projects relevant to this club"></textarea><button class="btn-ai-write" data-field="relevantProjects"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-users"></i> Campus Involvement</label><div class="textarea-ai-wrap"><textarea class="inp" id="campusInvolvement" rows="3" placeholder="Other campus activities and roles"></textarea><button class="btn-ai-write" data-field="campusInvolvement"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-trophy"></i> Achievements</label><div class="textarea-ai-wrap"><textarea class="inp" id="campusAchievements" rows="3" placeholder="Your notable achievements"></textarea><button class="btn-ai-write" data-field="campusAchievements"><i class="fas fa-magic"></i></button></div></div>
+                    </div>
+                    <!-- Internship/Job Fields -->
+                    <div class="dynamic-section hidden" id="jobFields">
+                        <div class="form-group"><label><i class="fas fa-briefcase"></i> Work Experience</label><div class="textarea-ai-wrap"><textarea class="inp" id="workExperience" rows="4" placeholder="Company Name | Role | Duration | Description"></textarea><button class="btn-ai-write" data-field="workExperience"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-certificate"></i> Certifications</label><div class="textarea-ai-wrap"><textarea class="inp" id="certifications" rows="3" placeholder="Certification Name | Issuer | Year"></textarea><button class="btn-ai-write" data-field="certifications"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-code"></i> Projects</label><div class="textarea-ai-wrap"><textarea class="inp" id="jobProjects" rows="4" placeholder="Project Name | Technologies | Description | Link"></textarea><button class="btn-ai-write" data-field="jobProjects"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-trophy"></i> Achievements</label><div class="textarea-ai-wrap"><textarea class="inp" id="jobAchievements" rows="3" placeholder="Your professional achievements"></textarea><button class="btn-ai-write" data-field="jobAchievements"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-address-book"></i> References (Optional)</label><div class="textarea-ai-wrap"><textarea class="inp" id="jobReferences" rows="2" placeholder="Reference Name | Role | Email/Phone"></textarea><button class="btn-ai-write" data-field="jobReferences"><i class="fas fa-magic"></i></button></div></div>
+                    </div>
+                    <!-- Academic Fields -->
+                    <div class="dynamic-section hidden" id="academicFields">
+                        <div class="form-row">
+                            <div class="form-group"><label><i class="fas fa-chart-bar"></i> GPA/CGPA</label><input type="text" class="inp" id="gpa" placeholder="e.g., 8.5/10 or 3.8/4.0"></div>
+                            <div class="form-group"><label><i class="fas fa-microscope"></i> Research Work</label><div class="textarea-ai-wrap"><textarea class="inp" id="researchWork" rows="2" placeholder="Research papers, publications"></textarea><button class="btn-ai-write" data-field="researchWork"><i class="fas fa-magic"></i></button></div></div>
+                        </div>
+                        <div class="form-group"><label><i class="fas fa-book"></i> Relevant Coursework</label><div class="textarea-ai-wrap"><textarea class="inp" id="coursework" rows="3" placeholder="List relevant courses"></textarea><button class="btn-ai-write" data-field="coursework"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-flask"></i> Academic Projects</label><div class="textarea-ai-wrap"><textarea class="inp" id="academicProjects" rows="4" placeholder="Project Name | Course | Description"></textarea><button class="btn-ai-write" data-field="academicProjects"><i class="fas fa-magic"></i></button></div></div>
+                        <div class="form-group"><label><i class="fas fa-trophy"></i> Achievements</label><div class="textarea-ai-wrap"><textarea class="inp" id="academicAchievements" rows="3" placeholder="Academic awards, scholarships"></textarea><button class="btn-ai-write" data-field="academicAchievements"><i class="fas fa-magic"></i></button></div></div>
+                    </div>
+                </div>
+                <!-- Template Selection -->
+                <div class="template-section">
+                    <h4 class="template-section-title"><i class="fas fa-palette"></i> Choose a Template</h4>
+                    <div id="templatesContainer"></div>
+                </div>
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary" id="step3Back"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button class="btn btn-primary" id="step3Next"><i class="fas fa-magic"></i> Generate Resume</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5 (scratch): Preview & Download — shown after skill gap in scratch flow -->
+        <div class="wizard-step" id="step4">
+            <div class="preview-layout">
+                <div class="preview-left">
+                    <div class="preview-header">
+                        <h3><i class="fas fa-eye"></i> Resume Preview</h3>
+                        <div class="preview-actions">
+                            <button class="btn btn-sm btn-outline-primary" id="btnChangeTemplateScratch" style="margin-right: 8px;"><i class="fas fa-palette"></i> Change Template</button>
+                            <button class="btn btn-sm btn-secondary" id="zoomOut"><i class="fas fa-minus"></i></button>
+                            <span class="zoom-level" id="zoomLevel">100%</span>
+                            <button class="btn btn-sm btn-secondary" id="zoomIn"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="preview-container" id="previewContainer">
+                        <div class="resume-viewport" id="resumeViewport">
+                            <div class="resume-sheet" id="resumeSheet"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-right">
+                    <div class="edit-panel glass">
+                        <h4><i class="fas fa-edit"></i> Review &amp; Edit</h4>
+                        <p class="edit-hint">Edit the generated text below. Changes will reflect in the preview.</p>
+                        <textarea class="edit-textarea" id="editTextarea" rows="20"></textarea>
+                        <div class="edit-actions">
+                            <button class="btn btn-primary" id="applyChanges"><i class="fas fa-check"></i> Apply Changes</button>
+                            <button class="btn btn-secondary" id="resetChanges"><i class="fas fa-undo"></i> Reset</button>
+                        </div>
+                    </div>
+                    <!-- AI Enhance Resume Panel (no upload for scratch flow) -->
+                    <div class="ai-enhance-panel glass" id="aiEnhancePanel">
+                        <h4><i class="fas fa-magic"></i> AI Enhance Resume</h4>
+                        <p class="edit-hint">Improve grammar, ATS keywords &amp; professional tone with AI.</p>
+                        <p class="enhance-label">Enhance a specific section:</p>
+                        <div class="enhance-btns-grid">
+                            <button class="enhance-btn" data-section="summary"><i class="fas fa-user"></i> Summary</button>
+                            <button class="enhance-btn" data-section="experience"><i class="fas fa-briefcase"></i> Experience</button>
+                            <button class="enhance-btn" data-section="projects"><i class="fas fa-code"></i> Projects</button>
+                            <button class="enhance-btn" data-section="achievements"><i class="fas fa-trophy"></i> Achievements</button>
+                            <button class="enhance-btn" data-section="certifications"><i class="fas fa-certificate"></i> Certifications</button>
+                            <button class="enhance-btn" data-section="skills"><i class="fas fa-tools"></i> Skills</button>
+                        </div>
+                        <hr class="enhance-divider">
+                        <button class="btn btn-primary btn-block" id="enhanceFullBtn"><i class="fas fa-magic"></i> Enhance Full Resume with AI</button>
+                        <hr class="enhance-divider">
+                        <div class="optimize-controls-box glass">
+                            <div class="optimize-header">
+                                <span class="optimize-title"><i class="fas fa-sliders-h"></i> AI Layout Optimizer</span>
+                                <span class="optimize-badge" id="optBadge_scratch"><i class="fas fa-bolt"></i> Auto-Fit</span>
+                            </div>
+                            <p class="optimize-desc">Intelligently expand thin content or compress overflowing text to fit 1 page.</p>
+                            <div class="optimize-input-group">
+                                <select class="form-control optimize-select" id="optimizeMode_scratch">
+                                    <option value="balanced" selected>Balanced Fit (Default)</option>
+                                    <option value="compact">Compact (Compress Content)</option>
+                                    <option value="detailed">Detailed (Expand Content)</option>
+                                </select>
+                                <button class="btn btn-optimize-ai" id="btnOptimizeContent_scratch"><i class="fas fa-wand-magic-sparkles"></i> Optimize Fit</button>
+                            </div>
+                            <div class="layout-intelligence-report hidden" id="layoutReport_scratch"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill Gap Analyser Trigger (scratch flow) -->
+                    <div class="skill-gap-trigger glass" id="skillGapTrigger">
+                        <div class="sgt-left">
+                            <div class="sgt-icon"><i class="fas fa-chart-bar"></i></div>
+                            <div>
+                                <h4>Analyse Your Skill Gap</h4>
+                                <p>Check your ATS score, find missing skills &amp; get course recommendations.</p>
+                            </div>
+                        </div>
+                        <ul class="sgt-features">
+                            <li><i class="fas fa-check-circle"></i> Instant ATS match score</li>
+                            <li><i class="fas fa-check-circle"></i> Missing skills for your target role</li>
+                            <li><i class="fas fa-check-circle"></i> Curated courses to close the gap</li>
+                        </ul>
+                        <button class="btn btn-primary" id="openSkillGapBtn">
+                            <i class="fas fa-search"></i> Analyse Skills
+                        </button>
+                    </div>
+                    <div class="download-panel glass">
+                        <h4><i class="fas fa-download"></i> Download Resume</h4>
+                        <div class="dl-menu">
+                            <button class="dl-item" id="downloadPDF"><i class="fas fa-file-pdf"></i><span>Download PDF</span></button>
+                            <button class="dl-item" id="downloadJPG"><i class="fas fa-file-image"></i><span>Download JPG</span></button>
+                            <button class="dl-item" id="downloadTXT"><i class="fas fa-file-alt"></i><span>Download TXT</span></button>
+                        </div>
+                    </div>
+                    <div class="restart-panel">
+                        <button class="btn btn-secondary btn-block" id="restartBtn"><i class="fas fa-redo"></i> Build Another Resume</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SKILL GAP ANALYSER SECTION
+    ═══════════════════════════════════════ -->
+    <section class="skill-gap-section hidden" id="skillGap">
+      <div class="skill-gap-card-wrap">
+        <div class="builder-header">
+            <span class="section-badge">AI Powered</span>
+            <h2 class="section-title">Skill Gap Analyser</h2>
+            <p class="section-desc">Get your ATS score, discover skill gaps, find top courses &amp; receive a personalised AI roadmap</p>
+        </div>
+
+        <div class="gap-input-card glass">
+            <div class="gap-input-row">
+                <input type="text" class="inp" id="gapRoleInput" placeholder="Enter target job role (e.g. Machine Learning Engineer, Frontend Developer...)">
+                <textarea class="gap-jd-input inp" id="gapJdInput" placeholder="Optional: paste the job description here for more accurate analysis..."></textarea>
+                <button class="btn btn-primary" id="runGapBtn">
+                    <i class="fas fa-search"></i> Analyse My Skill Gap
+                </button>
+            </div>
+        </div>
+
+        <div class="gap-results" id="gapResults" style="display:none">
+            <!-- Top row: ATS Ring + Gap Chips + Matched Chips -->
+            <div class="gap-results-grid">
+                <div class="gap-card ats-card">
+                    <h4>ATS Score</h4>
+                    <div class="ats-ring-wrap">
+                        <svg class="ats-ring" viewBox="0 0 120 120">
+                            <circle class="ring-bg" cx="60" cy="60" r="50"/>
+                            <circle class="ring-fill" id="atsRingFill" cx="60" cy="60" r="50"/>
+                        </svg>
+                        <div class="ats-score-text">
+                            <span id="atsScoreNum">0</span>
+                            <span class="ats-pct">%</span>
+                        </div>
+                    </div>
+                    <div class="ats-label" id="atsLabel"></div>
+                    <div class="ats-matched" id="atsMatched"></div>
+                </div>
+                <div class="gap-card skills-gap-card">
+                    <h4><i class="fas fa-times-circle"></i> Skill Gaps Found</h4>
+                    <div class="gap-skills-list" id="gapSkillsList"></div>
+                </div>
+                <div class="gap-card matched-card">
+                    <h4><i class="fas fa-check-circle"></i> Your Matched Skills</h4>
+                    <div class="matched-skills-list" id="matchedSkillsList"></div>
+                </div>
+            </div>
+
+            <!-- Course Recommendations -->
+            <div class="courses-section" id="coursesSection" style="display:none">
+                <h4><i class="fas fa-graduation-cap"></i> Recommended Courses for Your Skill Gaps</h4>
+                <p class="courses-subtitle">Top-rated Udemy &amp; Coursera courses — click to enrol</p>
+                <div class="courses-grid" id="coursesGrid"></div>
+            </div>
+
+            <!-- AI Roadmap -->
+            <div class="roadmap-section">
+                <div class="roadmap-header">
+                    <h4><i class="fas fa-map-signs"></i> Your Personalised Learning Roadmap</h4>
+                    <button class="btn btn-primary btn-sm" id="generateRoadmapBtn"><i class="fas fa-magic"></i> Generate AI Roadmap</button>
+                </div>
+                <div class="roadmap-box" id="roadmapBox">
+                    <p class="roadmap-hint">Run the analysis above, then click "Generate AI Roadmap" for a personalised 3-month learning plan.</p>
+                </div>
+            </div>
+
+            <!-- Gap Navigation Buttons -->
+            <div class="gap-navigation-actions" style="margin-top: 30px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" id="gapBackBtn"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" id="gapProceedBtn">Proceed to Resume Editor <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         UPLOAD FLOW: RESUME ANALYSIS & ENHANCE
+    ═══════════════════════════════════════ -->
+    <section class="resume-enhance-section hidden" id="resumeEnhanceSection">
+        <div class="builder-header">
+            <span class="section-badge">AI Enhancement</span>
+            <h2 class="section-title">Resume Analysis &amp; Enhancement</h2>
+            <p class="section-desc">Review your uploaded resume, get AI-powered improvements, select a template, then download your enhanced version.</p>
+        </div>
+
+        <div class="enhance-layout">
+            <!-- Left: Resume Preview -->
+            <div class="enhance-preview-col">
+                <div class="enhance-preview-card glass">
+                    <div class="enhance-preview-hdr">
+                        <h4><i class="fas fa-eye"></i> Resume Preview</h4>
+                        <div class="preview-actions">
+                            <button class="btn btn-sm btn-secondary" id="enhZoomOut"><i class="fas fa-minus"></i></button>
+                            <span class="zoom-level" id="enhZoomLevel">80%</span>
+                            <button class="btn btn-sm btn-secondary" id="enhZoomIn"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="preview-container" id="enhPreviewContainer">
+                        <div class="resume-viewport" id="enhResumeViewport">
+                            <div class="resume-sheet" id="enhResumeSheet"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Controls -->
+            <div class="enhance-controls-col">
+
+                <!-- Edit Panel -->
+                <div class="enh-panel glass" id="enhEditPanel">
+                    <h4><i class="fas fa-edit"></i> Edit Resume Content</h4>
+                    <p class="edit-hint">Edit the raw text below and apply to update the preview.</p>
+                    <textarea class="edit-textarea" id="enhEditTextarea" rows="14"></textarea>
+                    <div class="edit-actions" style="margin-top:14px">
+                        <button class="btn btn-primary btn-sm" id="enhApplyChanges"><i class="fas fa-check"></i> Apply Changes</button>
+                        <button class="btn btn-secondary btn-sm" id="enhResetChanges"><i class="fas fa-undo"></i> Reset</button>
+                    </div>
+                </div>
+
+                <!-- AI Improve Panel -->
+                <div class="enh-panel glass enh-ai-panel">
+                    <div class="enh-ai-header">
+                        <div class="enh-ai-icon"><i class="fas fa-magic"></i></div>
+                        <div>
+                            <h4>AI Resume Enhancement</h4>
+                            <p class="edit-hint" style="margin:0">Improve grammar, ATS keywords &amp; professional tone.</p>
+                        </div>
+                    </div>
+                    <p class="enhance-label" style="margin-top:14px">Enhance a specific section:</p>
+                    <div class="enhance-btns-grid">
+                        <button class="enhance-btn" data-section="summary" data-target="enh"><i class="fas fa-user"></i> Summary</button>
+                        <button class="enhance-btn" data-section="experience" data-target="enh"><i class="fas fa-briefcase"></i> Experience</button>
+                        <button class="enhance-btn" data-section="projects" data-target="enh"><i class="fas fa-code"></i> Projects</button>
+                        <button class="enhance-btn" data-section="achievements" data-target="enh"><i class="fas fa-trophy"></i> Achievements</button>
+                        <button class="enhance-btn" data-section="certifications" data-target="enh"><i class="fas fa-certificate"></i> Certifications</button>
+                        <button class="enhance-btn" data-section="skills" data-target="enh"><i class="fas fa-tools"></i> Skills</button>
+                    </div>
+                    <hr class="enhance-divider">
+                    <button class="btn btn-primary btn-block" id="enhFullResumeBtn"><i class="fas fa-wand-magic-sparkles"></i> Enhance Full Resume with AI</button>
+                    <hr class="enhance-divider">
+                    <div class="optimize-controls-box glass">
+                        <div class="optimize-header">
+                            <span class="optimize-title"><i class="fas fa-sliders-h"></i> AI Layout Optimizer</span>
+                            <span class="optimize-badge" id="optBadge_enh"><i class="fas fa-bolt"></i> Auto-Fit</span>
+                        </div>
+                        <p class="optimize-desc">Intelligently expand thin content or compress overflowing text to fit 1 page.</p>
+                        <div class="optimize-input-group">
+                            <select class="form-control optimize-select" id="optimizeMode_enh">
+                                <option value="balanced" selected>Balanced Fit (Default)</option>
+                                <option value="compact">Compact (Compress Content)</option>
+                                <option value="detailed">Detailed (Expand Content)</option>
+                            </select>
+                            <button class="btn btn-optimize-ai" id="btnOptimizeContent_enh"><i class="fas fa-wand-magic-sparkles"></i> Optimize Fit</button>
+                        </div>
+                        <div class="layout-intelligence-report hidden" id="layoutReport_enh"></div>
+                    </div>
+                </div>
+
+                <!-- Template Selection for Upload Flow -->
+                <div class="enh-panel glass">
+                    <h4><i class="fas fa-palette"></i> Choose Template</h4>
+                    <p class="edit-hint">Pick a premium layout to apply to your enhanced resume.</p>
+                    <div class="enh-template-grid" id="enhTemplateGrid"></div>
+                </div>
+
+                <!-- Download Panel -->
+                <div class="enh-panel glass">
+                    <h4><i class="fas fa-download"></i> Download Enhanced Resume</h4>
+                    <div class="dl-menu">
+                        <button class="dl-item" id="enhDownloadPDF"><i class="fas fa-file-pdf"></i><span>Download PDF</span></button>
+                        <button class="dl-item" id="enhDownloadJPG"><i class="fas fa-file-image"></i><span>Download JPG</span></button>
+                        <button class="dl-item" id="enhDownloadTXT"><i class="fas fa-file-alt"></i><span>Download TXT</span></button>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn btn-secondary btn-block" id="enhRestartBtn"><i class="fas fa-redo"></i> Start Over</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Template Preview Modal -->
+    <div class="template-modal" id="templateModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Template Preview</h3>
+                <div class="preview-actions" style="margin-left: auto; margin-right: 20px; display: flex; align-items: center; gap: 8px;">
+                    <button class="btn btn-sm btn-primary" id="modalUseTemplateBtn"><i class="fas fa-check"></i> Use This Template</button>
+                    <button class="btn btn-sm btn-secondary" id="modalZoomOut"><i class="fas fa-minus"></i></button>
+                    <span class="zoom-level" id="modalZoomLevel">100%</span>
+                    <button class="btn btn-sm btn-secondary" id="modalZoomIn"><i class="fas fa-plus"></i></button>
+                </div>
+                <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-resume-viewport" id="modalResumeViewport">
+                    <div class="modal-resume" id="modalResume"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resumeSheetPrint" style="position:fixed;left:-9999px;top:-9999px;"></div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text" id="loadingText">Generating your resume...</p>
+            <p class="loading-subtext" id="loadingSubtext">AI is crafting the perfect content for you</p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast-notification"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content-simple">
+            <div class="footer-brand-simple">
+                <div class="footer-logo"><i class="fas fa-file-signature"></i></div>
+                <span>AI Resume Builder</span>
+            </div>
+            <div class="footer-socials-simple">
+                <a href="https://github.com/tausifmd6565-bit" target="_blank" aria-label="Github"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/md-tausif-494831306" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://twitter.com/mdtausif" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+            <p class="footer-by">Created by <a href="#" class="footer-link">Md Tausif</a> &middot; Innoverse AMU</p>
+            <p class="footer-copyright">&copy; 2026 AI Resume Builder. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <div class="modal-overlay hidden" id="optimizationModalOverlay">
+        <div class="modal glass" style="max-width: 800px; width: 90%; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h3><i class="fas fa-compress-alt"></i> Review Optimized Content</h3>
+                <button class="close-modal" id="closeOptModal">&times;</button>
+            </div>
+            <div class="modal-body" style="flex: 1; overflow-y: auto;">
+                <p>Please review the AI's content optimizations before applying them to your resume.</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                    <div>
+                        <h4 style="margin-bottom:10px; color:var(--dark);">Original</h4>
+                        <textarea id="optOriginalText" readonly style="width:100%; height:400px; padding:15px; border:2px solid var(--gray-light); border-radius:var(--radius-md); background:#f9fafb; font-family:monospace; font-size:12px; resize:none;"></textarea>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom:10px; color:var(--primary);">Optimized</h4>
+                        <textarea id="optOptimizedText" readonly style="width:100%; height:400px; padding:15px; border:2px solid var(--primary-light); border-radius:var(--radius-md); background:#fff; font-family:monospace; font-size:12px; resize:none;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 20px; border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: flex-end; gap: 15px;">
+                <button class="btn btn-secondary" id="btnRejectOpt">Reject Changes</button>
+                <button class="btn btn-primary" id="btnAcceptOpt">Accept &amp; Apply</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js?v=20260725_3"></script>
+</body>
+</html>

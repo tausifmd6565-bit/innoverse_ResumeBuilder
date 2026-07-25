@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ai-resume-builder
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: PORT
+        value: 3000
+      - key: PYTHON_PARSER_URL
+        value: http://127.0.0.1:5001
