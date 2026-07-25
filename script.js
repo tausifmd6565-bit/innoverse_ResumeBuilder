@@ -2279,14 +2279,28 @@ function resetBuilder() {
 // MOBILE MENU
 // ============================================
 function initMobileMenu() {
-    if (!els.mobileMenuBtn || !els.mobileMenu) return;
-    els.mobileMenuBtn.addEventListener('click', () => els.mobileMenu.classList.toggle('active'));
-    els.mobileMenu.querySelectorAll('.mobile-link').forEach(link => {
-        link.addEventListener('click', () => els.mobileMenu.classList.remove('active'));
+    const btn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    if (!btn || !menu) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    menu.querySelectorAll('.mobile-link').forEach(link => {
+        link.addEventListener('click', () => menu.classList.remove('active'));
     });
 
     // Skill Gap Analyser direct link handler (navbar & mobile drawer)
     const triggerSkillGap = () => {
+        menu.classList.remove('active');
         const role = state.formData.targetRole || 'Software Engineer';
         showSkillGapSection(role, 'scratch');
     };
