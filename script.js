@@ -2284,6 +2284,18 @@ function initMobileMenu() {
     els.mobileMenu.querySelectorAll('.mobile-link').forEach(link => {
         link.addEventListener('click', () => els.mobileMenu.classList.remove('active'));
     });
+
+    // Skill Gap Analyser direct link handler (navbar & mobile drawer)
+    const triggerSkillGap = () => {
+        const role = state.formData.targetRole || 'Software Engineer';
+        showSkillGapSection(role, 'scratch');
+    };
+
+    const mlSkillGap = document.getElementById('mlSkillGap');
+    if (mlSkillGap) mlSkillGap.addEventListener('click', triggerSkillGap);
+
+    const navSkillGapBtn = document.getElementById('navSkillGapBtn');
+    if (navSkillGapBtn) navSkillGapBtn.addEventListener('click', triggerSkillGap);
 }
 
 // ============================================
