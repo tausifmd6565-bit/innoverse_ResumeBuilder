@@ -2025,13 +2025,15 @@ function resetBuilder() {
     state.formData = { year: '', purpose: '', experienceLevel: '', clubCategory: '', clubName: '', personalDetails: {}, targetRole: '', skills: [], categoryFields: {}, selectedTemplate: 'modern' };
     state.resumeText = ''; state.generatedHTML = ''; state.zoom = 1; state.photoDataUrl = '';
     document.querySelectorAll('.inp').forEach(inp => inp.value = '');
+    document.querySelectorAll('textarea').forEach(ta => ta.value = '');
     if (els.clubCategory) els.clubCategory.value = '';
     document.querySelectorAll('.quiz-opt').forEach(btn => btn.classList.remove('active'));
-    els.skillsTags.innerHTML = '';
-    els.photoImg.src = ''; els.photoImg.style.display = 'none';
-    els.photoInitials.style.display = 'flex'; els.photoInitials.textContent = '?';
-    Object.values(els.dynamicFields).forEach(el => el.classList.add('hidden'));
-    els.campusClubFields.classList.add('hidden');
+    if (els.skillsTags) els.skillsTags.innerHTML = '';
+    if (els.photoImg) { els.photoImg.src = ''; els.photoImg.style.display = 'none'; }
+    if (els.photoInitials) { els.photoInitials.style.display = 'flex'; els.photoInitials.textContent = '?'; }
+    if (els.dynamicFields) Object.values(els.dynamicFields).forEach(el => el.classList.add('hidden'));
+    if (els.campusClubFields) els.campusClubFields.classList.add('hidden');
+    if (els.editTextarea) els.editTextarea.value = '';
     selectTemplate('modern');
     updateZoom(); updateStepper();
 
@@ -2041,10 +2043,12 @@ function resetBuilder() {
     document.getElementById('mainStepper')?.classList.add('hidden');
     document.getElementById('skillGap')?.classList.add('hidden');
     document.getElementById('resumeEnhanceSection')?.classList.add('hidden');
-    els.wizardSteps.forEach(el => {
-        el.classList.remove('active');
-        el.classList.add('hidden');
-    });
+    if (els.wizardSteps) {
+        els.wizardSteps.forEach(el => {
+            el.classList.remove('active');
+            el.classList.add('hidden');
+        });
+    }
 
     // Reset upload panel state
     const pdfDropZone = document.getElementById('pdfDropZone');
@@ -2052,19 +2056,54 @@ function resetBuilder() {
     if (pdfDropZone) pdfDropZone.style.display = 'flex';
     if (uploadStatus) uploadStatus.style.display = 'none';
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    showToast('Ready to build a new resume! 🚀');
+    window.scrollTo({ top: document.getElementById('builder').offsetTop - 80, behavior: 'smooth' });
+    showToast('Started new blank resume project! 🚀');
 }
 
 // ============================================
 // MOBILE MENU
 // ============================================
 function initMobileMenu() {
-    if (!els.mobileMenuBtn || !els.mobileMenu) return;
-    els.mobileMenuBtn.addEventListener('click', () => els.mobileMenu.classList.toggle('active'));
-    els.mobileMenu.querySelectorAll('.mobile-link').forEach(link => {
-        link.addEventListener('click', () => els.mobileMenu.classList.remove('active'));
+    const btn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    if (!btn || !menu) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('active');
     });
+
+    document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    menu.querySelectorAll('.mobile-link').forEach(link => {
+        link.addEventListener('click', () => menu.classList.remove('active'));
+    });
+
+    // Resume Builder direct link -> reset to blank project
+    const mlBuilder = document.getElementById('mlBuilder');
+    if (mlBuilder) {
+        mlBuilder.addEventListener('click', () => {
+            menu.classList.remove('active');
+            resetBuilder();
+        });
+    }
+
+    // Skill Gap Analyser direct link handler
+    const triggerSkillGap = () => {
+        menu.classList.remove('active');
+        const role = state.formData.targetRole || 'Software Engineer';
+        showSkillGapSection(role, 'scratch');
+    };
+
+    const mlSkillGap = document.getElementById('mlSkillGap');
+    if (mlSkillGap) mlSkillGap.addEventListener('click', triggerSkillGap);
+
+    const navSkillGapBtn = document.getElementById('navSkillGapBtn');
+    if (navSkillGapBtn) navSkillGapBtn.addEventListener('click', triggerSkillGap);
 }
 
 // ============================================
@@ -2832,9 +2871,10 @@ function initEntryFlow() {
         });
     }
 
-    // Choice: Create From Scratch
+    // Choice: Create From Scratch (Blank New Project)
     if (choiceScratch) {
         choiceScratch.addEventListener('click', () => {
+            resetBuilder();
             state.flow = 'scratch';
             state.totalSteps = 4;
             document.getElementById('choicePanel').classList.add('hidden');
