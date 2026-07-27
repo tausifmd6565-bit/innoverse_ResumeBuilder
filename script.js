@@ -8,7 +8,7 @@
 // ============================================
 const state = {
     currentStep: 1,
-    totalSteps: 4,  // 4-step scratch flow: Q->
+    totalSteps: 4,  // 4-step scratch flow: Q→Details→Skills/Template→Preview
     flow: 'scratch', // 'scratch' or 'upload'
     formData: {
         year: '',
@@ -38,7 +38,7 @@ const templateCategories = {
     campus: {
         icon: 'fa-university',
         color: 'campus',
-        title: '<i class="fas fa-university"></i> Campus & Club',
+        title: '🏛️ Campus & Club',
         desc: 'For club & society interviews',
         templates: [
             { id: 'campusClub', name: 'Campus Club Profile', class: 'cc', color: '#222B38' },
@@ -51,7 +51,7 @@ const templateCategories = {
     internship: {
         icon: 'fa-briefcase',
         color: 'internship',
-        title: '<i class="fas fa-briefcase"></i> Internship & Job',
+        title: '💼 Internship & Job',
         desc: 'For internships, jobs & freelance',
         templates: [
             { id: 'modern', name: 'Modern Clean', class: 'mc', color: '#071A2F' },
@@ -69,7 +69,7 @@ const templateCategories = {
     academic: {
         icon: 'fa-graduation-cap',
         color: 'academic',
-        title: '<i class="fas fa-graduation-cap"></i> Academic & Research',
+        title: '🎓 Academic & Research',
         desc: 'For scholarships, research & academia',
         templates: [
             { id: 'classic', name: 'Classic Clean', class: 'cl', color: '#1a1a1a' },
@@ -179,23 +179,23 @@ function cacheElements() {
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    try { initEntryFlow(); } catch(e) { console.error('initEntryFlow crashed:', e); }
-    try { cacheElements(); } catch(e) { console.error('cacheElements crashed:', e); }
-    try { initStepper(); } catch(e) { console.error('initStepper crashed:', e); }
-    try { initQuizOptions(); } catch(e) { console.error('initQuizOptions crashed:', e); }
-    try { initPhotoUpload(); } catch(e) { console.error('initPhotoUpload crashed:', e); }
-    try { initSkillsInput(); } catch(e) { console.error('initSkillsInput crashed:', e); }
-    try { initTemplateGrid(); } catch(e) { console.error('initTemplateGrid crashed:', e); }
-    try { initNavigation(); } catch(e) { console.error('initNavigation crashed:', e); }
-    try { initZoomControls(); } catch(e) { console.error('initZoomControls crashed:', e); }
-    try { initDownloadButtons(); } catch(e) { console.error('initDownloadButtons crashed:', e); }
-    try { initModal(); } catch(e) { console.error('initModal crashed:', e); }
-    try { initMobileMenu(); } catch(e) { console.error('initMobileMenu crashed:', e); }
-    try { initAIWriteButtons(); } catch(e) { console.error('initAIWriteButtons crashed:', e); }
-    try { initNavbarScroll(); } catch(e) { console.error('initNavbarScroll crashed:', e); }
-    try { initAIEnhance(); } catch(e) { console.error('initAIEnhance crashed:', e); }
-    try { initSkillGap(); } catch(e) { console.error('initSkillGap crashed:', e); }
-    try { initEnhanceSection(); } catch(e) { console.error('initEnhanceSection crashed:', e); }
+    cacheElements();
+    initStepper();
+    initQuizOptions();
+    initPhotoUpload();
+    initSkillsInput();
+    initTemplateGrid();
+    initNavigation();
+    initZoomControls();
+    initDownloadButtons();
+    initModal();
+    initMobileMenu();
+    initAIWriteButtons();
+    initNavbarScroll();
+    initAIEnhance();
+    initSkillGap();
+    initEntryFlow();
+    initEnhanceSection();
 });
 
 // ============================================
@@ -255,20 +255,13 @@ function validateStep(step) {
             const el = document.getElementById(field);
             if (!el || !el.value.trim()) {
                 showToast('Please fill in all required fields');
-                if (el) {
-                    el.classList.add('input-error');
-                    el.focus();
-                }
+                el?.focus();
                 return false;
-            } else {
-                if (el) el.classList.remove('input-error');
             }
         }
         const email = document.getElementById('email').value;
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showToast('Please enter a valid email address');
-            const emailEl = document.getElementById('email');
-            if (emailEl) emailEl.focus();
             return false;
         }
     }
@@ -414,21 +407,18 @@ function initTemplateGrid() {
         }
     });
 
-    const container = els.templatesContainer || document.getElementById('templatesContainer');
-    if (!container) return;
-    container.innerHTML = html;
+    els.templatesContainer.innerHTML = html;
 
     // Event listeners
-    container.querySelectorAll('.tmpl-card').forEach(card => {
+    document.querySelectorAll('.tmpl-card').forEach(card => {
         card.addEventListener('click', (e) => {
             if (e.target.closest('.tmpl-btn-preview')) return;
             selectTemplate(card.dataset.template);
         });
     });
-    container.querySelectorAll('.tmpl-btn-preview').forEach(btn => {
+    document.querySelectorAll('.tmpl-btn-preview').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            e.preventDefault();
             openTemplatePreview(btn.dataset.template);
         });
     });
@@ -506,7 +496,7 @@ async function generateAIContent(field, btn) {
             prompt = `Suggest a list of 8-10 optimized, professional technical and soft skills for a resume targeting the role: "${role}". Return the suggested skills as a single comma-separated list of values only (e.g. "React, Node.js, Git, Communication"). Do not include any other text, numbers, formatting, or introduction.`;
         }
     } else if (field === 'targetRole') {
-        // targetRole is a short single-line job title - special handling
+        // targetRole is a short single-line job title — special handling
         if (existingVal) {
             prompt = `You are a professional resume writer. The user has written this job title/target role: "${existingVal}". Rewrite it as a clean, professional, ATS-optimized job title. Return ONLY the improved job title as a short phrase (3-5 words maximum). No explanations, no punctuation at the end, no quotes.`;
         } else {
@@ -514,7 +504,7 @@ async function generateAIContent(field, btn) {
             prompt = `Suggest a professional job title for a resume based on these skills: "${skills || 'Software Development'}". Return ONLY a clean job title (3-5 words). No explanations or quotes.`;
         }
     } else if (existingVal) {
-        prompt = `You are an expert resume writer. The user has written the following content for their resume field "${field}":\n"${existingVal}"\n\nPlease rewrite, restyle, and improve the English, grammar, professional tone, and ATS compatibility of this content. Do NOT invent any new accomplishments, projects, or credentials. Keep the core facts exactly the same, but present them in a highly polished, professional, and ATS-friendly manner. If the content is long, tighten and compress the wording without dropping any point - every fact must remain, just stated more concisely. If the content is very short, write it out in fuller, more complete sentences using only the facts given, without inventing anything new. Return ONLY the improved text, with no headers, introductions, conversational filler, or formatting quotes.`;
+        prompt = `You are an expert resume writer. The user has written the following content for their resume field "${field}":\n"${existingVal}"\n\nPlease rewrite, restyle, and improve the English, grammar, professional tone, and ATS compatibility of this content. Do NOT invent any new accomplishments, projects, or credentials. Keep the core facts exactly the same, but present them in a highly polished, professional, and ATS-friendly manner. Return ONLY the improved text, with no headers, introductions, conversational filler, or formatting quotes.`;
     } else {
         prompt = buildAIPrompt(field);
     }
@@ -542,60 +532,26 @@ async function generateAIContent(field, btn) {
         } else if (targetEl) {
             targetEl.value = generatedText;
             targetEl.dispatchEvent(new Event('input'));
-            showToast(existingVal ? 'Content improved using AI! ' : 'AI content generated successfully!');
+            showToast(existingVal ? 'Content improved using AI! ✨' : 'AI content generated successfully!');
         }
 
     } catch (error) {
         console.error('AI generation error:', error);
         if (field === 'skillsInput') {
-            showToast('AI service unavailable - could not suggest skills. Try again shortly.');
-        } else if (existingVal) {
-            // Restyle failed - apply a genuine local cleanup instead of silently
-            // leaving the text untouched, so the button visibly does something.
-            const fallbackText = localRestyleFallback(existingVal);
-            if (targetEl) {
-                targetEl.value = fallbackText;
-                targetEl.dispatchEvent(new Event('input'));
-            }
-            showToast('AI service unavailable - applied basic formatting instead. Try again shortly for full AI restyle.');
+            showToast('Failed to generate skills using AI.');
         } else {
-            const fallbackText = generateFallbackText(field);
+            const fallbackText = existingVal ? existingVal : generateFallbackText(field);
             if (targetEl) {
                 targetEl.value = fallbackText;
                 targetEl.dispatchEvent(new Event('input'));
             }
-            showToast('AI service unavailable - used a local starter draft. Edit or retry shortly.');
+            showToast(existingVal ? 'Failed to improve text. Kept original.' : 'Used local AI fallback.');
         }
     } finally {
         btn.classList.remove('generating');
         btn.innerHTML = '<i class="fas fa-magic"></i>';
         els.aiGeneratingPopup.classList.remove('active');
     }
-}
-
-/**
- * Lightweight, dependency-free text cleanup used only when the AI restyle
- * request fails. Not a substitute for real AI polish - just makes sure the
- * "restyle" action always visibly does *something* rather than a silent no-op.
- */
-function localRestyleFallback(text) {
-    if (!text) return text;
-    return text
-        .split('\n')
-        .map(line => {
-            let l = line.replace(/[ \t]+/g, ' ').trim();
-            if (!l) return '';
-            // Normalize common bullet markers to a single "- " prefix
-            l = l.replace(/^[-*â€¢]\s*/, '- ');
-            // Capitalize the first letter of the line/sentence
-            const prefixMatch = l.match(/^(-\s*)?/);
-            const prefix = prefixMatch ? prefixMatch[0] : '';
-            const rest = l.slice(prefix.length);
-            const capped = rest.charAt(0).toUpperCase() + rest.slice(1);
-            return prefix + capped;
-        })
-        .join('\n')
-        .replace(/\s+([,.;:])/g, '$1'); // remove stray space before punctuation
 }
 
 function buildAIPrompt(field) {
@@ -672,51 +628,16 @@ function generateFallbackText(field) {
 // MODAL
 // ============================================
 function initModal() {
-    const overlay = document.getElementById('modalOverlay');
-    const closeBtn = document.getElementById('modalClose');
-    if (overlay) overlay.addEventListener('click', closeModal);
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-    const modalUseBtn = document.getElementById('modalUseTemplateBtn');
-    if (modalUseBtn) {
-        modalUseBtn.addEventListener('click', () => {
-            if (state.previewingTemplateId) {
-                selectTemplate(state.previewingTemplateId);
-                closeModal();
-                showToast('Template applied!');
-            }
-        });
-    }
-
-    const btnChangeScratch = document.getElementById('btnChangeTemplateScratch');
-    if (btnChangeScratch) {
-        btnChangeScratch.addEventListener('click', () => {
-            if (typeof goToStep === 'function') {
-                goToStep(3);
-                showToast('Choose a new template layout.');
-            }
-        });
-    }
+    document.getElementById('modalOverlay').addEventListener('click', closeModal);
+    document.getElementById('modalClose').addEventListener('click', closeModal);
 }
 
 function openTemplatePreview(templateId) {
-    state.previewingTemplateId = templateId;
-    const t = allTemplates.find(t => t.id === templateId) || allTemplates[0];
-    const modalTitle = els.modalTitle || document.getElementById('modalTitle');
-    const modalResume = els.modalResume || document.getElementById('modalResume');
-    const templateModal = els.templateModal || document.getElementById('templateModal');
-
-    if (modalTitle) modalTitle.textContent = t.name + ' - Preview';
-
-    const dataToRender = (state.resumeText || state.formData.personalDetails?.fullName)
-        ? parseResumeText(state.resumeText || '')
-        : sampleData;
-
-    if (modalResume) modalResume.innerHTML = buildResumeHTML(dataToRender, templateId, true);
-    if (templateModal) {
-        templateModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
+    const t = allTemplates.find(t => t.id === templateId);
+    els.modalTitle.textContent = t.name + ' - Preview';
+    els.modalResume.innerHTML = buildResumeHTML(sampleData, templateId, true);
+    els.templateModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
     
     // Auto-fit modal zoom based on modal body clientWidth
     const modalBody = document.querySelector('.modal-body');
@@ -730,8 +651,7 @@ function openTemplatePreview(templateId) {
 }
 
 function closeModal() {
-    const templateModal = els.templateModal || document.getElementById('templateModal');
-    if (templateModal) templateModal.classList.remove('active');
+    els.templateModal.classList.remove('active');
     document.body.style.overflow = '';
 }
 
@@ -765,16 +685,6 @@ function initNavigation() {
     document.getElementById('restartBtn').addEventListener('click', resetBuilder);
     document.getElementById('applyChanges').addEventListener('click', applyChanges);
     document.getElementById('resetChanges').addEventListener('click', resetChanges);
-
-    // Auto-close any open modals when navigating via navbar links
-    document.querySelectorAll('.nav-link, .nav-btn').forEach(link => {
-        link.addEventListener('click', () => {
-            const optModal = document.getElementById('optimizationModalOverlay');
-            if (optModal) optModal.classList.add('hidden');
-            closeModal();
-        });
-    });
-
     // Skill Gap trigger button inside step 4 (scratch flow)
     const openGapBtn = document.getElementById('openSkillGapBtn');
     if (openGapBtn) {
@@ -850,7 +760,7 @@ function collectFormData() {
         location: document.getElementById('location').value,
         college: document.getElementById('college').value,
         degree: document.getElementById('degree').value,
-        gradYear: document.getElementById('gradYear')?.value || '',
+        gradYear: document.getElementById('gradYear').value,
         undergradGpa: document.getElementById('undergradGpa')?.value || '',
         interSchool: document.getElementById('interSchool')?.value || '',
         interGpa: document.getElementById('interGpa')?.value || '',
@@ -918,7 +828,7 @@ function generateResumeTextFallback() {
         text += `ABOUT ME\n`;
         text += `I am a ${d.experienceLevel.toLowerCase()} ${p.degree} student at ${p.college}, passionate about contributing to ${d.clubName || 'campus activities'}. `;
         text += `With a strong foundation in ${d.skills.slice(0, 3).join(', ') || 'relevant skills'}, I am eager to bring fresh ideas and dedication to the team.\n\n`;
-        text += `EDUCATION\n${p.college}\n${p.degree}\nExpected Graduation: ${p.gradYear || ""}dYear || '2027'}\n\n`;
+        text += `EDUCATION\n${p.college}\n${p.degree}\nExpected Graduation: ${p.gradYear}\n\n`;
         if (d.categoryFields.motivation) text += `WHY I WANT TO JOIN\n${d.categoryFields.motivation}\n\n`;
         if (d.skills.length > 0) text += `SKILLS\n${d.skills.join(', ')}\n\n`;
         if (d.categoryFields.relevantProjects) text += `PROJECTS\n${d.categoryFields.relevantProjects}\n\n`;
@@ -929,7 +839,7 @@ function generateResumeTextFallback() {
         text += `PROFESSIONAL SUMMARY\n`;
         text += `${d.experienceLevel} ${p.degree} student at ${p.college} with expertise in ${d.skills.slice(0, 4).join(', ') || 'relevant technologies'}. `;
         text += `Seeking ${purpose.toLowerCase()} opportunities to apply technical skills and contribute to impactful projects.\n\n`;
-        text += `EDUCATION\n${p.college}\n${p.degree}\nExpected Graduation: ${p.gradYear || ""}dYear || '2027'}\n\n`;
+        text += `EDUCATION\n${p.college}\n${p.degree}\nExpected Graduation: ${p.gradYear}\n\n`;
         if (d.skills.length > 0) text += `SKILLS\n${d.skills.join(', ')}\n\n`;
         if (d.categoryFields.projects) text += `PROJECTS\n${d.categoryFields.projects}\n\n`;
         if (d.categoryFields.workExperience) text += `EXPERIENCE\n${d.categoryFields.workExperience}\n\n`;
@@ -940,7 +850,7 @@ function generateResumeTextFallback() {
         text += `${p.degree} student at ${p.college} with a strong academic record. `;
         if (d.categoryFields.gpa) text += `Current GPA: ${d.categoryFields.gpa}. `;
         text += `Passionate about research and academic excellence in ${d.skills.slice(0, 3).join(', ') || 'the field'}.\n\n`;
-        text += `EDUCATION\n${p.college}\n${p.degree}\nExpected Graduation: ${p.gradYear || ""}dYear || '2027'}\n\n`;
+        text += `EDUCATION\n${p.college}\n${p.degree}\nExpected Graduation: ${p.gradYear}\n`;
         if (d.categoryFields.gpa) text += `GPA: ${d.categoryFields.gpa}\n`;
         text += `\n`;
         if (d.categoryFields.coursework) text += `COURSEWORK\n${d.categoryFields.coursework}\n\n`;
@@ -959,104 +869,77 @@ function generateResumeTextFallback() {
 }
 
 // ============================================
-// PARSE RESUME TEXT — Robust Line-by-Line Section Classifier
+// PARSE RESUME TEXT
 // ============================================
 function parseResumeText(text) {
-    if (!text || !text.trim()) return {};
-
-    const data = {
-        fullName: '',
-        email: '',
-        phone: '',
-        location: '',
-        linkedin: '',
-        github: '',
-        languages: '',
-        summary: '',
-        education: '',
-        skills: [],
-        skillsText: '',
-        projects: '',
-        experience: '',
-        certifications: '',
-        achievements: ''
-    };
-
-    const lines = text.split(/\r?\n/);
-    let currentSection = 'summary';
-    const sectionContent = {};
-
-    lines.forEach(line => {
-        const trimmed = line.trim();
-        if (!trimmed) return;
-
-        const cleanKey = trimmed.toLowerCase().replace(/[^a-z]/g, '');
-
-        let matchedKey = null;
-        if (/^(name|candidate|fullname)/i.test(trimmed)) matchedKey = 'name';
-        else if (/^(contact|contactinfo|personalinfo)/i.test(trimmed)) matchedKey = 'contact';
-        else if (cleanKey.includes('summary') || cleanKey.includes('about') || cleanKey.includes('profile')) matchedKey = 'summary';
-        else if (cleanKey.includes('education') || cleanKey.includes('academic')) matchedKey = 'education';
-        else if (cleanKey.includes('skill') || cleanKey.includes('competenc') || cleanKey.includes('technolog')) matchedKey = 'skills';
-        else if (cleanKey.includes('project')) matchedKey = 'projects';
-        else if (cleanKey.includes('experience') || cleanKey.includes('work') || cleanKey.includes('employment')) matchedKey = 'experience';
-        else if (cleanKey.includes('certif') || cleanKey.includes('license')) matchedKey = 'certifications';
-        else if (cleanKey.includes('achiev') || cleanKey.includes('award') || cleanKey.includes('honor')) matchedKey = 'achievements';
-        else if (cleanKey.includes('language')) matchedKey = 'languages';
-
-        const isStandaloneHeader = matchedKey && (trimmed.length < 35 || trimmed === trimmed.toUpperCase());
-
-        if (isStandaloneHeader) {
-            currentSection = matchedKey;
-            if (!sectionContent[currentSection]) sectionContent[currentSection] = [];
-        } else {
-            const emailM = trimmed.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-            if (emailM && !data.email) data.email = emailM[0];
-
-            const phoneM = trimmed.match(/\+?\d{1,4}[\s\-\.]?\(?\d{2,5}\)?[\s\-\.]?\d{3,5}[\s\-\.]?\d{3,5}/);
-            if (phoneM && !data.phone && !trimmed.includes('202') && !trimmed.includes('201')) data.phone = phoneM[0];
-
-            if (!sectionContent[currentSection]) sectionContent[currentSection] = [];
-            sectionContent[currentSection].push(trimmed);
+    const data = {};
+    const sections = text.split(/\n(?=[A-Z][A-Z\s]+\n)/);
+    sections.forEach(section => {
+        const lines = section.trim().split('\n');
+        const title = lines[0].trim();
+        const content = lines.slice(1).join('\n').trim();
+        const key = title.toLowerCase().replace(/\s+/g, '');
+        if (title === 'NAME') data.fullName = content;
+        else if (title === 'CONTACT') {
+            const contactLines = content.split('\n');
+            contactLines.forEach(line => {
+                if (line.includes('Email:')) data.email = line.replace('Email:', '').trim();
+                if (line.includes('Phone:')) data.phone = line.replace('Phone:', '').trim();
+                if (line.includes('Location:')) data.location = line.replace('Location:', '').trim();
+                if (line.includes('LinkedIn:')) data.linkedin = line.replace('LinkedIn:', '').trim();
+                if (line.includes('GitHub:')) data.github = line.replace('GitHub:', '').trim();
+                if (line.includes('Languages:')) data.languages = line.replace('Languages:', '').trim();
+            });
         }
+        else if (key.includes('summary') || key.includes('about') || key.includes('profile')) data.summary = content;
+        else if (key.includes('education')) data.education = content;
+        else if (key.includes('skill')) data.skillsText = content;
+        else if (key.includes('project')) data.projects = content;
+        else if (key.includes('experience') || key.includes('work')) data.experience = content;
+        else if (key.includes('certif')) data.certifications = content;
+        else if (key.includes('achievement')) data.achievements = content;
+        else if (key.includes('research')) data.research = content;
+        else if (key.includes('coursework')) data.coursework = content;
+        else if (key.includes('motivation') || key.includes('join')) data.motivation = content;
+        else if (key.includes('involvement')) data.campusInvolvement = content;
+        else if (key.includes('language') && !data.languages) data.languages = content;
+        else if (key.includes('ref')) data.references = content;
+        data[title] = content;
     });
 
-    if (sectionContent['name']) data.fullName = sectionContent['name'].join(' ');
-    if (sectionContent['summary']) data.summary = sectionContent['summary'].join('\n');
-    if (sectionContent['education']) data.education = sectionContent['education'].join('\n');
-    if (sectionContent['experience']) data.experience = sectionContent['experience'].join('\n');
-    if (sectionContent['projects']) data.projects = sectionContent['projects'].join('\n');
-    if (sectionContent['certifications']) data.certifications = sectionContent['certifications'].join('\n');
-    if (sectionContent['achievements']) data.achievements = sectionContent['achievements'].join('\n');
-    if (sectionContent['languages']) data.languages = sectionContent['languages'].join(', ');
-
-    if (sectionContent['skills']) {
-        const rawSkillsStr = sectionContent['skills'].join(', ');
-        data.skillsText = rawSkillsStr;
-        data.skills = rawSkillsStr.split(/[,|•·\n]+/).map(s => s.trim()).filter(s => s && s.length < 35);
+    const p = state.formData.personalDetails;
+    if (p) {
+        data.fullName = data.fullName || p.fullName;
+        data.email = data.email || p.email;
+        data.phone = data.phone || p.phone;
+        data.location = data.location || p.location;
+        data.college = p.college;
+        data.degree = p.degree;
+        data.gradYear = p.gradYear;
+        data.undergradGpa = p.undergradGpa || '';
+        data.interSchool = p.interSchool || '';
+        data.interGpa = p.interGpa || '';
+        data.interBoard = p.interBoard || '';
+        data.interYear = p.interYear || '';
+        data.highSchool = p.highSchool || '';
+        data.highGpa = p.highGpa || '';
+        data.highBoard = p.highBoard || '';
+        data.highYear = p.highYear || '';
+        data.dob = p.dob || '';
+        data.additionalInfo = p.additionalInfo || '';
+        data.linkedin = data.linkedin || p.linkedin;
+        data.github = data.github || p.github;
+        data.languages = data.languages || p.languages;
+        data.photo = p.photo || '';
+        data.targetRole = state.formData.targetRole || '';
     }
+    data.references = data.references || state.formData.categoryFields?.references || '';
 
-    const p = state.formData.personalDetails || {};
-    data.fullName = data.fullName || p.fullName || 'MD TAUSIF';
-    data.email = data.email || p.email || '';
-    data.phone = data.phone || p.phone || '';
-    data.location = data.location || p.location || '';
-    data.targetRole = data.targetRole || p.targetRole || 'AI / Machine Learning Engineer';
-    data.college = p.college || '';
-    data.degree = p.degree || '';
-    data.undergradGpa = p.undergradGpa || '';
-    data.gradYear = p.gradYear || '';
-    data.interSchool = p.interSchool || '';
-    data.interGpa = p.interGpa || '';
-    data.interBoard = p.interBoard || '';
-    data.interYear = p.interYear || '';
-    data.highSchool = p.highSchool || '';
-    data.highGpa = p.highGpa || '';
-    data.highBoard = p.highBoard || '';
-    data.highYear = p.highYear || '';
-    data.linkedin = data.linkedin || p.linkedin || '';
-    data.github = data.github || p.github || '';
-
+    if (data.skillsText) {
+        data.skills = data.skillsText.split(/[,\n]+/).map(s => s.trim()).filter(s => s);
+    } else if (state.formData.skills?.length > 0) {
+        data.skills = state.formData.skills;
+    }
     return data;
 }
 
@@ -1066,40 +949,17 @@ function parseResumeText(text) {
 function getContentDensity(data) {
     let score = 0;
     if (data.summary && data.summary.trim().length > 0) score += Math.min(data.summary.trim().length / 60, 4);
-    if (data.experience && data.experience.trim().length > 0) score += Math.min(data.experience.trim().length / 80, 7);
-    if (data.projects && data.projects.trim().length > 0) score += Math.min(data.projects.trim().length / 80, 7);
+    if (data.experience && data.experience.trim().length > 0) score += Math.min(data.experience.trim().length / 100, 6);
+    if (data.projects && data.projects.trim().length > 0) score += Math.min(data.projects.trim().length / 100, 6);
     if (data.education && data.education.trim().length > 0) score += Math.min(data.education.trim().length / 80, 4);
-    if (data.college) score += 3;
-    if (data.interSchool) score += 2;
-    if (data.highSchool) score += 2;
     if (data.skills && data.skills.length > 0) score += Math.min(data.skills.length * 0.4, 4);
-    if (data.certifications && data.certifications.trim().length > 0) score += Math.min(data.certifications.trim().length / 100, 3);
-    if (data.achievements && data.achievements.trim().length > 0) score += Math.min(data.achievements.trim().length / 100, 3);
+    if (data.certifications && data.certifications.trim().length > 0) score += 2;
+    if (data.achievements && data.achievements.trim().length > 0) score += 2;
     if (data.campusInvolvement && data.campusInvolvement.trim().length > 0) score += 2;
-    if (data.languages && data.languages.trim().length > 0) score += 1;
-
-    if (score < 8)  return 'low';
-    if (score > 28) return 'very-high';
-    if (score > 17) return 'high';
+    
+    if (score < 11) return 'low';
+    if (score > 22) return 'high';
     return 'medium';
-};
-
-// ============================================
-// PER-COLUMN DENSITY
-// ============================================
-// Unlike getContentDensity() (whole-resume), this scores just ONE column's
-// worth of section text and returns a density keyword for it. Two-column
-// templates use this separately for sidebar vs main so a column that's
-// naturally shorter (e.g. Work Experience+Projects only) gets larger
-// font/spacing to fill its space, instead of looking emptier than its
-// neighbour just because it has fewer sections.
-function getColumnDensityScore(sectionScores) {
-    return sectionScores.reduce((sum, s) => sum + (s || 0), 0);
-}
-function columnDensityClass(score, lowMax, highMin) {
-    if (score < lowMax) return 'col-density-low';
-    if (score > highMin) return 'col-density-high';
-    return 'col-density-medium';
 }
 
 // ============================================
@@ -1121,89 +981,63 @@ function estimateSectionLines(text, colWidthChars) {
 }
 
 /**
- * Pre-Flight Multi-Candidate Layout Planner & Visual Harmony Score Engine.
- * Evaluates candidate layout placements (Education in Right vs Left, etc.)
- * and selects the candidate that maximizes S_harmony = 100 - 1.5*|H_left - H_right| - 3.0*Overflow.
+ * Balances columns for two-panel templates by shuffling moveable sections.
+ * left  = array of section objects { key, label, score, html }
+ * right = array of section objects { key, label, score, html }
  */
-// Dynamic section placement overrides computed by ConstraintLayoutEngine
-let gSectionPlacementOverrides = {};
+function balanceDualPanelSections(data) {
+    // Estimated characters per line before wrapping
+    const LEFT_COL_CHARS = 32;
+    const RIGHT_COL_CHARS = 65;
 
-function balanceDualPanelSections(data, templateId = '') {
-    if (gSectionPlacementOverrides && Object.keys(gSectionPlacementOverrides).length > 0) {
-        return {
-            isLeft: (key) => gSectionPlacementOverrides[key] === 'left',
-            isRight: (key) => gSectionPlacementOverrides[key] === 'right' || !gSectionPlacementOverrides[key],
-            filter: (fn) => Object.entries(gSectionPlacementOverrides).filter(fn),
-            moveables: Object.entries(gSectionPlacementOverrides),
-            leftScore: 12,
-            rightScore: 12,
-            harmonyScore: 95
-        };
+    // Left column always has: contact, skills, education
+    const fixedLeftScore =
+        5 + // contact block constant
+        estimateSectionLines((data.skills || []).join('\n'), LEFT_COL_CHARS) * 1.5 +
+        estimateSectionLines(data.college, LEFT_COL_CHARS) * 1.5;
+
+    // Right column always has: summary, experience, projects
+    const fixedRightScore =
+        estimateSectionLines(data.summary, RIGHT_COL_CHARS) +
+        estimateSectionLines(data.experience, RIGHT_COL_CHARS) * 1.2 +
+        estimateSectionLines(data.projects, RIGHT_COL_CHARS) * 1.2;
+
+    // All moveable sections with default preferred side
+    const moveables = [
+        { key: 'certifications', label: 'Certifications:', text: data.certifications, side: 'right' },
+        { key: 'achievements',   label: 'Achievements:',   text: data.achievements,   side: 'right' },
+        { key: 'languages',      label: 'Languages:',      text: data.languages,       side: 'left'  },
+        { key: 'additionalInfo', label: 'Additional Info:', text: data.additionalInfo, side: 'left'  },
+    ].map(m => ({
+        ...m,
+        scoreLeft: estimateSectionLines(m.text, LEFT_COL_CHARS),
+        scoreRight: estimateSectionLines(m.text, RIGHT_COL_CHARS)
+    }));
+
+    let leftScore  = fixedLeftScore  + moveables.filter(m => m.side === 'left') .reduce((a, m) => a + m.scoreLeft, 0);
+    let rightScore = fixedRightScore + moveables.filter(m => m.side === 'right').reduce((a, m) => a + m.scoreRight, 0);
+
+    // Greedily rebalance
+    const THRESHOLD = 4;
+    let pass = 0;
+    while (pass++ < 10) {
+        let changed = false;
+        for (const m of moveables) {
+            if (m.scoreRight < 1) continue;
+            const diff = rightScore - leftScore;
+            // if right is too heavy, move a right item to left
+            if (diff > THRESHOLD && m.side === 'right') {
+                m.side = 'left'; rightScore -= m.scoreRight; leftScore += m.scoreLeft; changed = true;
+            }
+            // if left is too heavy, move a left item to right
+            else if (diff < -THRESHOLD && m.side === 'left') {
+                m.side = 'right'; leftScore -= m.scoreLeft; rightScore += m.scoreRight; changed = true;
+            }
+        }
+        if (!changed) break;
     }
 
-    const LEFT_COL_CHARS = 30;  // Narrow 30% sidebar capacity
-    const RIGHT_COL_CHARS = 65; // Wide 70% main column capacity
-
-    const lineWeight = (text, charsPerLine) => {
-        if (!text || !text.trim()) return 0;
-        return text.trim().split('\n').reduce((tot, line) => tot + Math.ceil(Math.max(1, line.length) / charsPerLine), 0);
-    };
-
-    const eduWeightLeft = 5 + (data.college ? 3 : 0) + (data.interSchool ? 2 : 0) + (data.highSchool ? 2 : 0);
-    const eduWeightRight = 2 + (data.college ? 2 : 0) + (data.interSchool ? 1.5 : 0) + (data.highSchool ? 1.5 : 0);
-
-    const skillsCount = (data.skills || []).length;
-    const skillsWeightLeft = Math.ceil(skillsCount / 2) + 2;
-    const skillsWeightRight = Math.ceil(skillsCount / 4) + 1.5;
-
-    const summaryLines = lineWeight(data.summary, RIGHT_COL_CHARS);
-    const expLines = lineWeight(data.experience, RIGHT_COL_CHARS);
-    const projLines = lineWeight(data.projects || data.categoryFields?.relevantProjects, RIGHT_COL_CHARS);
-    const motivLines = lineWeight(data.motivation, RIGHT_COL_CHARS);
-    const certLines = lineWeight(data.certifications, RIGHT_COL_CHARS);
-    const achvLines = lineWeight(data.achievements, RIGHT_COL_CHARS);
-    const langLines = lineWeight(data.languages, LEFT_COL_CHARS);
-
-    const fixedSidebarLines = 9; // Photo, Name, Contact
-
-    // Candidate 1: Education, Experience, Projects, Motivation in RIGHT column (DEFAULT BEST FOR FRESHERS)
-    const cand1 = [
-        { key: 'education',      side: 'right', scoreL: eduWeightLeft, scoreR: eduWeightRight },
-        { key: 'experience',     side: 'right', scoreL: lineWeight(data.experience, LEFT_COL_CHARS), scoreR: expLines },
-        { key: 'projects',       side: 'right', scoreL: lineWeight(data.projects, LEFT_COL_CHARS), scoreR: projLines },
-        { key: 'motivation',     side: 'right', scoreL: lineWeight(data.motivation, LEFT_COL_CHARS), scoreR: motivLines },
-        { key: 'certifications', side: (summaryLines + expLines + projLines + eduWeightRight > 24) ? 'left' : 'right', scoreL: lineWeight(data.certifications, LEFT_COL_CHARS), scoreR: certLines },
-        { key: 'achievements',   side: (summaryLines + expLines + projLines + eduWeightRight > 20) ? 'left' : 'right', scoreL: lineWeight(data.achievements, LEFT_COL_CHARS), scoreR: achvLines },
-        { key: 'languages',      side: 'left',  scoreL: langLines, scoreR: lineWeight(data.languages, RIGHT_COL_CHARS) },
-        { key: 'skills',         side: 'left',  scoreL: skillsWeightLeft, scoreR: skillsWeightRight }
-    ];
-
-    const hLeft1 = (fixedSidebarLines + cand1.filter(c => c.side === 'left').reduce((a, c) => a + c.scoreL, 0)) * 22;
-    const hRight1 = (cand1.filter(c => c.side === 'right').reduce((a, c) => a + c.scoreR, 0) + summaryLines) * 22;
-    const harm1 = 100 - (1.5 * Math.abs(hLeft1 - hRight1)) - (3.0 * Math.max(0, Math.max(hLeft1, hRight1) - 1050));
-
-    // Candidate 2: Certifications shifted left if right side is heavy
-    const cand2 = cand1.map(c => {
-        if (c.key === 'certifications' && hRight1 > 850) return { ...c, side: 'left' };
-        return { ...c };
-    });
-    const hLeft2 = (fixedSidebarLines + cand2.filter(c => c.side === 'left').reduce((a, c) => a + c.scoreL, 0)) * 22;
-    const hRight2 = (cand2.filter(c => c.side === 'right').reduce((a, c) => a + c.scoreR, 0) + summaryLines) * 22;
-    const harm2 = 100 - (1.5 * Math.abs(hLeft2 - hRight2)) - (3.0 * Math.max(0, Math.max(hLeft2, hRight2) - 1050));
-
-    const winner = (harm2 >= harm1) ? cand2 : cand1;
-    const bestLeftScore = (harm2 >= harm1) ? (hLeft2 / 22) : (hLeft1 / 22);
-    const bestRightScore = (harm2 >= harm1) ? (hRight2 / 22) : (hRight1 / 22);
-
-    return {
-        isLeft: (key) => winner.find(c => c.key === key)?.side === 'left',
-        isRight: (key) => winner.find(c => c.key === key)?.side === 'right',
-        filter: (fn) => winner.filter(fn),
-        moveables: winner,
-        leftScore: bestLeftScore,
-        rightScore: bestRightScore,
-        harmonyScore: Math.max(harm1, harm2)
-    };
+    return moveables;
 }
 
 function buildResumeHTML(data, templateId, isPreview = false) {
@@ -1236,7 +1070,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
     const contactVerticalHTML = contactVerticalItems.join('');
 
     const skillsHTML = (data.skills || []).map(s => `<span class="${prefix}-skill-tag">${s}</span>`).join('');
-    const skillsListHTML = (data.skills || []).map(s => `â€¢ ${s}`).join('<br>');
+    const skillsListHTML = (data.skills || []).map(s => `• ${s}`).join('<br>');
 
     // Elegant Beige specific skills ratings
     const skillsDotsHTML = (data.skills || []).map((s, idx) => {
@@ -1244,8 +1078,8 @@ function buildResumeHTML(data, templateId, isPreview = false) {
         const rating = ratings[idx % ratings.length];
         let dots = '';
         for (let i = 1; i <= 5; i++) {
-            if (i <= rating) dots += '<span class="eb-dot active">â—</span>';
-            else dots += '<span class="eb-dot">â—‹</span>';
+            if (i <= rating) dots += '<span class="eb-dot active">●</span>';
+            else dots += '<span class="eb-dot">○</span>';
         }
         return `<div class="eb-skill-row"><span class="eb-skill-name">${s}</span><span class="eb-skill-dots">${dots}</span></div>`;
     }).join('');
@@ -1256,16 +1090,6 @@ function buildResumeHTML(data, templateId, isPreview = false) {
     const section = (title, content) => {
         if (!content || !content.trim()) return '';
         return `<div class="${prefix}-section"><div class="${prefix}-section-title">${title}</div><div class="${prefix}-content">${content.replace(/\n/g, '<br>')}</div></div>`;
-    };
-
-    const sidebarSection = (title, content, maxWords = 45) => {
-        if (!content || !content.trim()) return '';
-        let processed = content.trim();
-        const words = processed.split(/\s+/);
-        if (words.length > maxWords) {
-            processed = words.slice(0, maxWords).join(' ') + '...';
-        }
-        return `<div class="${prefix}-section"><div class="${prefix}-section-title">${title}</div><div class="${prefix}-content">${processed.replace(/\n/g, '<br>')}</div></div>`;
     };
 
     const getStructuredEducationHTML = (prefix, reverseOrder = false) => {
@@ -1299,7 +1123,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                     <div class="${prefix}-edu-header">UNDERGRADUATE</div>
                     <div class="${prefix}-edu-row">
                         <span class="${prefix}-edu-inst">${data.college}</span>
-                        <span class="${prefix}-edu-gpa">${data.undergradGpa || ''} | ${data.degree}${data.gradYear ? ` (${data.gradYear})` : ''}</span>
+                        <span class="${prefix}-edu-gpa">${data.undergradGpa || ''} | ${data.degree} (${data.gradYear})</span>
                     </div>
                 </div>
             `);
@@ -1346,21 +1170,22 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'creative': {
-            const bal = balanceDualPanelSections(data);
-            const crMoveEdu = bal.isLeft('education');
-            const crMoveCerts = bal.isLeft('certifications');
-            const crMoveAchievements = bal.isLeft('achievements');
-            const crMoveLangs = bal.isLeft('languages');
-            const crMoveInterests = bal.isLeft('additionalInfo');
+            const rawLeft  = _sectionScore(data.summary) + _sectionScore(data.languages) + (data.skills || []).length * 0.8 + 3;
+            const rawRight = _sectionScore(data.experience) + _sectionScore(data.projects) + _sectionScore(data.certifications) + _sectionScore(data.achievements) + 4;
+
+            const diff = rawRight - rawLeft;
+            const crMoveEdu = diff > 5;
+            const crMoveCerts = data.certifications && (diff > 3 || crMoveEdu);
+            const crMoveAchievements = data.achievements && (diff > 4 || crMoveEdu);
 
             const sidebarHTML = `
                 <div class="cr-sidebar">
                     <div class="cr-photo-wrap">${photoHTML}</div>
-                    ${sidebarSection('About Me', data.summary)}
+                    ${section('About Me', data.summary)}
                     ${section('Contact', contactVerticalHTML)}
-                    ${crMoveLangs ? section('Languages', data.languages) : ''}
+                    ${section('Languages', data.languages)}
                     <div class="cr-section">
-                        <div class="cr-section-title">Skills</div>
+                        <div class="cr-section-title">Expertise / Core Skills</div>
                         <div class="cr-content">${skillsHTML}</div>
                     </div>
                     ${crMoveEdu ? `
@@ -1368,7 +1193,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="cr-section-title">Education</div>
                         <div class="cr-content">${getStructuredEducationHTML('cr', false)}</div>
                     </div>` : ''}
-                    ${crMoveInterests && data.additionalInfo ? section('Interests', data.additionalInfo) : ''}
+                    ${data.additionalInfo ? section('Interests', data.additionalInfo) : ''}
                     ${crMoveCerts ? section('Certifications', data.certifications) : ''}
                     ${crMoveAchievements ? section('Achievements', data.achievements) : ''}
                 </div>
@@ -1387,8 +1212,6 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                             <div class="cr-content">${getStructuredEducationHTML('cr', false)}</div>
                         </div>` : ''}
                         ${section('Projects', data.projects)}
-                        ${!crMoveLangs ? section('Languages', data.languages) : ''}
-                        ${!crMoveInterests && data.additionalInfo ? section('Interests', data.additionalInfo) : ''}
                         ${!crMoveCerts ? section('Certifications', data.certifications) : ''}
                         ${!crMoveAchievements ? section('Achievements', data.achievements) : ''}
                     </div>
@@ -1398,17 +1221,15 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'minimalPro': {
-            const bal = balanceDualPanelSections(data);
-            const mpMoveEdu = bal.isLeft('education');
-            const mpMoveCerts = bal.isLeft('certifications');
-            const mpMoveAchievements = bal.isLeft('achievements');
-            const mpMoveLangs = bal.isLeft('languages');
+            const rawLeft  = _sectionScore(data.summary) + _sectionScore(data.languages) + (data.skills || []).length * 0.8 + 3;
+            const rawRight = _sectionScore(data.experience) + _sectionScore(data.projects) + _sectionScore(data.certifications) + 4;
 
-            const mpLeftDensity  = columnDensityClass(bal.leftScore, 9, 18);
-            const mpRightDensity = columnDensityClass(bal.rightScore, 9, 18);
+            const diff = rawRight - rawLeft;
+            const mpMoveEdu = diff > 4;
+            const mpMoveCerts = data.certifications && (diff > 3 || mpMoveEdu);
 
             const sidebarHTML = `
-                <div class="mp-sidebar ${mpLeftDensity}">
+                <div class="mp-sidebar">
                     <div class="mp-photo-wrap">${photoHTML}</div>
                     ${data.dob ? section('Date of Birth', data.dob) : ''}
                     ${section('About Me', data.summary)}
@@ -1428,7 +1249,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                 </div>
             `;
             const mainHTML = `
-                <div class="mp-main ${mpRightDensity}">
+                <div class="mp-main">
                     <div class="mp-header">
                         <div class="mp-name">${data.fullName || 'Your Name'}</div>
                         <div class="mp-role">${data.targetRole || 'Professional'}</div>
@@ -1456,69 +1277,49 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                     </div>
                 </div>
             `;
-            const balEB = balanceDualPanelSections(data, 'elegantBeige');
-            const ebEduLeft = balEB.isLeft('education');
-            const ebLangLeft = balEB.isLeft('languages');
-            const ebCertsLeft = balEB.isLeft('certifications');
             const sidebarHTML = `
                 <div class="eb-sidebar">
                     ${section('Contact', contactVerticalHTML)}
-                    ${ebEduLeft ? `
                     <div class="eb-section">
                         <div class="eb-section-title">Education</div>
                         <div class="eb-content">${getStructuredEducationHTML('eb', true)}</div>
-                    </div>` : ''}
+                    </div>
                     <div class="eb-section">
                         <div class="eb-section-title">Skills</div>
                         <div class="eb-content">${skillsDotsHTML}</div>
                     </div>
-                    ${ebCertsLeft ? section('Certifications', data.certifications) : ''}
-                    ${ebLangLeft ? section('Languages', data.languages) : ''}
+                    ${section('Certifications', data.certifications)}
                 </div>
             `;
             const mainHTML = `
                 <div class="eb-main">
                     ${headerCardHTML}
                     ${section('Professional Summary', data.summary)}
-                    ${!ebEduLeft ? `
-                    <div class="eb-section">
-                        <div class="eb-section-title">Education</div>
-                        <div class="eb-content">${getStructuredEducationHTML('eb', false)}</div>
-                    </div>` : ''}
                     ${section('Experience', data.experience)}
                     ${section('Projects', data.projects)}
-                    ${!ebCertsLeft ? section('Certifications', data.certifications) : ''}
-                    ${!ebLangLeft ? section('Languages', data.languages) : ''}
+                    ${section('Languages', data.languages)}
+                    ${section('References', data.references)}
                 </div>
             `;
             outputHTML = `<div class="eb-resume ${densityClass}">${sidebarHTML}${mainHTML}</div>`;
             break;
         }
         case 'diagonal': {
-            const balDG = balanceDualPanelSections(data, 'diagonal');
-            const dgEduLeft = balDG.isLeft('education');
-            const dgCertsLeft = balDG.isLeft('certifications');
-            const dgLangLeft = balDG.isLeft('languages');
-            const dgAchvLeft = balDG.isLeft('achievements');
-
             const sidebarHTML = `
                 <div class="dg-sidebar">
                     <div class="dg-photo-wrap">${photoHTML}</div>
                     <div class="dg-diagonal-divider"></div>
                     <div class="dg-sidebar-content">
                         ${section('Contact', contactVerticalHTML)}
-                        ${dgEduLeft ? `
                         <div class="dg-section">
                             <div class="dg-section-title">Education</div>
                             <div class="dg-content">${getStructuredEducationHTML('dg', false)}</div>
-                        </div>` : ''}
+                        </div>
                         <div class="dg-section">
                             <div class="dg-section-title">Skills</div>
                             <div class="dg-content">${skillsHTML}</div>
                         </div>
-                        ${dgCertsLeft ? section('Certifications', data.certifications) : ''}
-                        ${dgLangLeft ? section('Languages', data.languages) : ''}
-                        ${dgAchvLeft ? section('Achievements', data.achievements) : ''}
+                        ${section('Certifications', data.certifications)}
                     </div>
                 </div>
             `;
@@ -1529,16 +1330,10 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="dg-role">${data.targetRole || 'Professional'}</div>
                     </div>
                     ${section('Profile Summary', data.summary)}
-                    ${!dgEduLeft ? `
-                    <div class="dg-section">
-                        <div class="dg-section-title">Education</div>
-                        <div class="dg-content">${getStructuredEducationHTML('dg', false)}</div>
-                    </div>` : ''}
                     ${section('Experience', data.experience)}
                     ${section('Projects', data.projects)}
-                    ${!dgCertsLeft ? section('Certifications', data.certifications) : ''}
-                    ${!dgAchvLeft ? section('Awards', data.achievements) : ''}
-                    ${!dgLangLeft ? section('Languages', data.languages) : ''}
+                    ${section('Awards', data.achievements)}
+                    ${section('Languages', data.languages)}
                 </div>
             `;
             outputHTML = `<div class="dg-resume ${densityClass}">${sidebarHTML}${mainHTML}</div>`;
@@ -1590,7 +1385,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                 }
             }
 
-            // Build RIGHT content - fixed sections always in right
+            // Build RIGHT content — fixed sections always in right
             let dpRightContent = '';
             if (data.experience && data.experience.trim()) {
                 dpRightContent += `<div class="dp-rsection">
@@ -1648,11 +1443,10 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                                     <div class="dp-pill-label">Skills:</div>
                                     <div class="dp-lcontent">${dpSkillsRows}</div>
                                 </div>
-                                ${dpBalanced.isLeft('education') ? `
                                 <div class="dp-lsection">
                                     <div class="dp-pill-label">Education:</div>
                                     <div class="dp-lcontent">${getStructuredEducationHTML('dp', true)}</div>
-                                </div>` : ''}
+                                </div>
                                 ${dpLeftExtra}
                                 <div class="dp-contact-block">
                                     ${contactVerticalHTML}
@@ -1660,11 +1454,6 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                             </div>
                         </div>
                         <div class="dp-right">
-                            ${dpBalanced.isRight('education') ? `
-                            <div class="dp-rsection">
-                                <div class="dp-pill-label">Education:</div>
-                                <div class="dp-rcontent">${getStructuredEducationHTML('dp', false)}</div>
-                            </div>` : ''}
                             ${dpRightContent}
                         </div>
                     </div>
@@ -1752,7 +1541,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                     <div class="cm-edu-card">
                         <div class="cm-edu-title">Undergraduate</div>
                         <div class="cm-edu-inst">${data.college || 'College'}</div>
-                        <div class="cm-edu-gpa">${data.undergradGpa || ''} (${data.gradYear || ""} || ''})</div>
+                        <div class="cm-edu-gpa">${data.undergradGpa || ''} (${data.gradYear || ''})</div>
                     </div>
                 </div>
             `;
@@ -1779,42 +1568,36 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'campusAchiever': {
-            const balCA = balanceDualPanelSections(data, 'campusAchiever');
-            const caEduLeft = balCA.isLeft('education');
-            const caMoveAchv = balCA.isLeft('achievements');
+            // Balance: if right much longer than left, move some content to sidebar
+            const caLeftScore  = (data.skills || []).length * 0.8 + 4; // edu + skills are always in left
+            const caRightScore = _sectionScore(data.summary) + _sectionScore(data.motivation) + _sectionScore(data.campusInvolvement) + _sectionScore(data.achievements);
+            const caMoveAchv   = data.achievements && (caRightScore - caLeftScore) > 5;
 
             const sidebarHTML = `
                 <div class="ca-sidebar">
                     <div class="ca-photo-wrap">${photoHTML}</div>
-                    ${sidebarSection('About Me', data.summary)}
-                    ${section('Contact', contactVerticalHTML)}
+                    <div class="ca-section">
+                        <div class="ca-section-title">Education</div>
+                        <div class="ca-content">${getStructuredEducationHTML('ca', true)}</div>
+                    </div>
                     <div class="ca-section">
                         <div class="ca-section-title">Skills</div>
                         <div class="ca-content">${skillsHTML}</div>
                     </div>
-                    ${caEduLeft ? `
-                    <div class="ca-section">
-                        <div class="ca-section-title">Education</div>
-                        <div class="ca-content">${getStructuredEducationHTML('ca', true)}</div>
-                    </div>` : ''}
                     ${section('Languages', data.languages)}
                     ${caMoveAchv ? section('Achievements', data.achievements) : ''}
+                    ${section('Contact', contactVerticalHTML)}
                 </div>
             `;
             const mainHTML = `
                 <div class="ca-main">
                     <div class="ca-header">
                         <div class="ca-name">${data.fullName || 'Your Name'}</div>
-                        <div class="ca-status">Applying For: ${data.targetRole || 'Software Development Engineer'}</div>
+                        <div class="ca-status">Current Status: ${state.formData.year || 'Student'} · ${data.degree || ''}</div>
                     </div>
+                    ${section('About Me', data.summary)}
                     ${section('Why I Want To Join', data.motivation)}
-                    ${!caEduLeft ? `
-                    <div class="ca-section">
-                        <div class="ca-section-title">Education</div>
-                        <div class="ca-content">${getStructuredEducationHTML('ca', false)}</div>
-                    </div>` : ''}
-                    ${section('Previous Club Experience', data.categoryFields?.experience || data.experience)}
-                    ${section('Projects & Contributions', data.categoryFields?.relevantProjects || data.projects)}
+                    ${section('Campus Involvement', data.campusInvolvement)}
                     ${!caMoveAchv ? section('Achievements', data.achievements) : ''}
                 </div>
             `;
@@ -1822,19 +1605,22 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'boldBlue': {
-            const balBB = balanceDualPanelSections(data);
-            const bbMoveEdu = balBB.isLeft('education');
-            const bbMoveCerts = balBB.isLeft('certifications');
-            const bbMoveAchv = balBB.isLeft('achievements');
+            const rawLeft  = _sectionScore(data.summary) + _sectionScore(data.languages) + (data.skills || []).length * 0.8 + 3;
+            const rawRight = _sectionScore(data.experience) + _sectionScore(data.projects) + _sectionScore(data.certifications) + _sectionScore(data.achievements) + 4;
+
+            const diff = rawRight - rawLeft;
+            const bbMoveEdu = diff > 5;
+            const bbMoveCerts = data.certifications && (diff > 3 || bbMoveEdu);
+            const bbMoveAchv = data.achievements && (diff > 4 || bbMoveEdu);
 
             const sidebarHTML = `
                 <div class="bb-sidebar">
                     <div class="bb-photo-wrap">${photoHTML}</div>
-                    ${sidebarSection('About Me', data.summary)}
+                    ${section('About Me', data.summary)}
                     ${section('Contact', contactVerticalHTML)}
                     ${section('Languages', data.languages)}
                     <div class="bb-section">
-                        <div class="bb-section-title">Skills</div>
+                        <div class="bb-section-title">Expertise</div>
                         <div class="bb-content">${skillsHTML}</div>
                     </div>
                     ${bbMoveEdu ? `
@@ -1883,7 +1669,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                     </div>
                     <div class="cl-section">
                         <div class="cl-section-title">Skills</div>
-                        <div class="cl-content">${skillsHTML}</div>
+                        <div class="cl-content">${(data.skills || []).join(', ')}</div>
                     </div>
                     ${section('Experience', data.experience)}
                     ${section('Projects', data.projects)}
@@ -2020,10 +1806,7 @@ function updateZoom() {
             modalZoomLevel.textContent = Math.round(state.modalZoom * 100) + '%';
         }
     }
-    const zoomEl = els.zoomLevel || document.getElementById('zoomLevel');
-    if (zoomEl) {
-        zoomEl.textContent = Math.round(state.zoom * 100) + '%';
-    }
+    els.zoomLevel.textContent = Math.round(state.zoom * 100) + '%';
 }
 function autoFitZoom() {
     const step4 = document.getElementById('step4');
@@ -2053,7 +1836,7 @@ function autoFitZoom() {
 }
 
 // ============================================
-// DOWNLOAD - Single Source of Truth Export Engine
+// DOWNLOAD — Single Source of Truth Export Engine
 // ============================================
 function initDownloadButtons() {
     document.getElementById('downloadPDF').addEventListener('click', downloadPDF);
@@ -2090,7 +1873,7 @@ async function waitForReadyState(container) {
 
 /**
  * Creates an off-screen clone of the resume HTML for export.
- * Uses the SAME HTML string as the preview - single source of truth.
+ * Uses the SAME HTML string as the preview — single source of truth.
  * Returns { clone, cleanup } where cleanup() removes it from DOM.
  */
 function createExportClone(htmlContent) {
@@ -2115,84 +1898,64 @@ function createExportClone(htmlContent) {
     };
 }
 
-/**
- * Shared export engine: captures a resume clone as a canvas at its FULL natural
- * height (never clipped to one page). Used by every download button so there is
- * exactly one place that owns capture behavior.
- */
-async function captureResumeCanvas(clone, scale) {
-    await waitForReadyState(clone);
-    
-    // Execute Layout Engine Pipeline on export clone
-    balanceResumeColumns(clone);
-    optimizeVerticalSpacingAndTypography(clone);
-
-    // Validate layout quality
-    const valResult = validateResumeLayout(clone);
-    if (!valResult.valid && valResult.errors.length > 0) {
-        console.warn('Layout Validation Warnings:', valResult.errors);
-    }
-
-    const fullHeight = Math.max(clone.scrollHeight, 1123);
-    const canvas = await html2canvas(clone, {
-        scale,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: 794,
-        height: fullHeight,
-        windowWidth: 794,
-        windowHeight: fullHeight,
-        logging: false,
-        onclone: (doc) => {
-            const el = doc.querySelector('.export-clone');
-            if (el) {
-                el.style.position = 'static';
-                el.style.left = '0';
-                el.style.top = '0';
-                el.style.width = '794px';
-                el.style.height = fullHeight + 'px';
-                el.style.overflow = 'visible'; // never clip content during capture
-            }
-        }
-    });
-    return canvas;
-}
-
-/** Slices a captured canvas into correctly-sized A4 pages and saves as PDF. */
-function exportCanvasToPDF(canvas, filename) {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pageW = 210;
-    const totalPxH = canvas.height;
-    const pageHeightPx = Math.round(canvas.width * (297 / 210));
-    const totalPages = Math.max(1, Math.ceil(totalPxH / pageHeightPx));
-
-    for (let pg = 0; pg < totalPages; pg++) {
-        if (pg > 0) pdf.addPage();
-        const srcY = pg * pageHeightPx;
-        const srcH = Math.min(pageHeightPx, totalPxH - srcY);
-        const slice = document.createElement('canvas');
-        slice.width = canvas.width;
-        slice.height = srcH;
-        slice.getContext('2d').drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
-        const sliceData = slice.toDataURL('image/png', 1.0);
-        const sliceH = (srcH / canvas.width) * pageW;
-        pdf.addImage(sliceData, 'PNG', 0, 0, pageW, sliceH);
-    }
-    pdf.save(filename);
-    return totalPages;
-}
-
 async function downloadPDF() {
     const { jsPDF } = window.jspdf;
-    showToast('Preparing PDFâ€¦');
+    showToast('Preparing PDF…');
 
     const { clone, cleanup } = createExportClone();
 
     try {
-        const canvas = await captureResumeCanvas(clone, 3);
-        exportCanvasToPDF(canvas, `${state.formData.personalDetails.fullName || 'Resume'}_Resume.pdf`);
+        // Wait for fonts, images, and CSS layout to settle
+        await waitForReadyState(clone);
+
+        // Capture the clone at 3x DPI for high-quality output
+        const canvas = await html2canvas(clone, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            width: 794,
+            height: 1123,
+            windowWidth: 794,
+            windowHeight: 1123,
+            logging: false,
+            onclone: (doc) => {
+                // Ensure the cloned element in html2canvas is also 794x1123
+                const el = doc.querySelector('.export-clone');
+                if (el) {
+                    el.style.position = 'static';
+                    el.style.left = '0';
+                    el.style.top = '0';
+                    el.style.width = '794px';
+                    el.style.height = '1123px';
+                    el.style.overflow = 'hidden';
+                }
+            }
+        });
+
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageW = 210;
+
+        // How many A4 pages does the content span?
+        const totalPxH = canvas.height;
+        const pageHeightPx = Math.round(canvas.width * (297 / 210));
+        const totalPages = Math.ceil(totalPxH / pageHeightPx);
+
+        for (let pg = 0; pg < totalPages; pg++) {
+            if (pg > 0) pdf.addPage();
+            const srcY  = pg * pageHeightPx;
+            const srcH  = Math.min(pageHeightPx, totalPxH - srcY);
+            // Slice canvas into individual A4 pages
+            const slice = document.createElement('canvas');
+            slice.width  = canvas.width;
+            slice.height = srcH;
+            slice.getContext('2d').drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+            const sliceData = slice.toDataURL('image/png', 1.0);
+            const sliceH = (srcH / canvas.width) * pageW;
+            pdf.addImage(sliceData, 'PNG', 0, 0, pageW, sliceH);
+        }
+
+        pdf.save(`${state.formData.personalDetails.fullName || 'Resume'}_Resume.pdf`);
         showToast('PDF downloaded successfully!');
     } catch (err) {
         console.error('PDF generation failed:', err);
@@ -2203,16 +1966,34 @@ async function downloadPDF() {
 }
 
 async function downloadJPG() {
-    showToast('Preparing JPGâ€¦');
+    showToast('Preparing JPG…');
     const { clone, cleanup } = createExportClone();
 
     try {
-        const canvas = await captureResumeCanvas(clone, 2);
-        // JPG is a single image, so multi-page content is captured as one tall image
-        // (nothing is cropped) rather than split into pages - PDF handles real pagination.
-        if (canvas.height > 1123 * 2 * 1.03) { // canvas is captured at scale 2, so compare against scaled page height
-            showToast('Resume spans multiple pages - JPG will be one tall image. Use PDF for paginated pages.');
-        }
+        await waitForReadyState(clone);
+
+        const canvas = await html2canvas(clone, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            width: 794,
+            height: 1123,
+            windowWidth: 794,
+            windowHeight: 1123,
+            logging: false,
+            onclone: (doc) => {
+                const el = doc.querySelector('.export-clone');
+                if (el) {
+                    el.style.position = 'static';
+                    el.style.left = '0';
+                    el.style.top = '0';
+                    el.style.width = '794px';
+                    el.style.height = '1123px';
+                    el.style.overflow = 'hidden';
+                }
+            }
+        });
         const link = document.createElement('a');
         link.download = `${state.formData.personalDetails.fullName || 'Resume'}_Resume.jpg`;
         link.href = canvas.toDataURL('image/jpeg', 0.95);
@@ -2272,44 +2053,18 @@ function resetBuilder() {
     if (uploadStatus) uploadStatus.style.display = 'none';
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    showToast('Ready to build a new resume! ');
+    showToast('Ready to build a new resume! 🚀');
 }
 
 // ============================================
 // MOBILE MENU
 // ============================================
 function initMobileMenu() {
-    const btn = document.getElementById('mobileMenuBtn');
-    const menu = document.getElementById('mobileMenu');
-    if (!btn || !menu) return;
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.toggle('active');
+    if (!els.mobileMenuBtn || !els.mobileMenu) return;
+    els.mobileMenuBtn.addEventListener('click', () => els.mobileMenu.classList.toggle('active'));
+    els.mobileMenu.querySelectorAll('.mobile-link').forEach(link => {
+        link.addEventListener('click', () => els.mobileMenu.classList.remove('active'));
     });
-
-    document.addEventListener('click', (e) => {
-        if (!menu.contains(e.target) && !btn.contains(e.target)) {
-            menu.classList.remove('active');
-        }
-    });
-
-    menu.querySelectorAll('.mobile-link').forEach(link => {
-        link.addEventListener('click', () => menu.classList.remove('active'));
-    });
-
-    // Skill Gap Analyser direct link handler (navbar & mobile drawer)
-    const triggerSkillGap = () => {
-        menu.classList.remove('active');
-        const role = state.formData.targetRole || 'Software Engineer';
-        showSkillGapSection(role, 'scratch');
-    };
-
-    const mlSkillGap = document.getElementById('mlSkillGap');
-    if (mlSkillGap) mlSkillGap.addEventListener('click', triggerSkillGap);
-
-    const navSkillGapBtn = document.getElementById('navSkillGapBtn');
-    if (navSkillGapBtn) navSkillGapBtn.addEventListener('click', triggerSkillGap);
 }
 
 // ============================================
@@ -2447,7 +2202,7 @@ async function enhanceSection(sectionKey, btn) {
         els.editTextarea.value = serialized;
         state.resumeText = serialized;
         applyChanges();
-        showToast(`Enhanced ${label} section successfully!`);
+        showToast(`Enhanced ${label} section successfully! ✨`);
     } catch (e) {
         console.error(e);
         showToast(`Failed to enhance ${label} section.`);
@@ -2485,7 +2240,7 @@ async function enhanceFullResume(btn) {
         els.editTextarea.value = enhancedText;
         state.resumeText = enhancedText;
         applyChanges();
-        showToast('Full resume enhanced successfully! ');
+        showToast('Full resume enhanced successfully! 🚀');
     } catch (e) {
         console.error(e);
         showToast('Failed to enhance full resume.');
@@ -2509,16 +2264,7 @@ const roleSkillsMap = {
     'cybersecurity analyst': ['Linux', 'Networking', 'Firewalls', 'SIEM', 'Cryptography', 'Penetration Testing', 'Incident Response', 'Wireshark', 'Python'],
     'product manager': ['Product Strategy', 'Agile Methodologies', 'User Research', 'Data Analysis', 'Roadmapping', 'Jira', 'SQL', 'A/B Testing'],
     'ui/ux designer': ['Figma', 'Wireframing', 'Prototyping', 'User Research', 'UI Design', 'Interaction Design', 'Adobe XD', 'HTML', 'CSS'],
-    'data analyst': ['SQL', 'Excel', 'Python', 'Pandas', 'Tableau', 'Power BI', 'Statistics', 'Data Visualization', 'Data Cleaning'],
-    'video editor': ['Adobe Premiere Pro', 'DaVinci Resolve', 'Color Grading', 'Audio Mixing', 'Motion Graphics', 'After Effects', 'Storytelling', 'Video Compression', 'Final Cut Pro'],
-    'video editing': ['Adobe Premiere Pro', 'DaVinci Resolve', 'Color Grading', 'Audio Mixing', 'Motion Graphics', 'After Effects', 'Storytelling', 'Video Compression', 'Final Cut Pro'],
-    'graphic designer': ['Adobe Photoshop', 'Adobe Illustrator', 'Typography', 'Color Theory', 'Branding', 'Figma', 'Layout Design', 'Canva'],
-    'photographer': ['Photo Composition', 'Lightroom', 'Photoshop', 'Lighting', 'Camera Operation', 'Photo Retouching'],
-    'content writer': ['SEO Writing', 'Copywriting', 'Content Strategy', 'Editing & Proofreading', 'Research', 'WordPress'],
-    'digital marketer': ['SEO', 'Google Ads', 'Meta Ads', 'Content Marketing', 'Email Marketing', 'Analytics', 'Social Media Strategy'],
-    'social media manager': ['Content Calendar Planning', 'Canva', 'Copywriting', 'Analytics', 'Community Management', 'Paid Ads Basics'],
-    'motion graphics designer': ['After Effects', 'Cinema 4D', 'Animation Principles', 'Adobe Premiere Pro', 'Typography', 'Storyboarding'],
-    'animator': ['After Effects', 'Blender', 'Storyboarding', 'Animation Principles', 'Character Rigging']
+    'data analyst': ['SQL', 'Excel', 'Python', 'Pandas', 'Tableau', 'Power BI', 'Statistics', 'Data Visualization', 'Data Cleaning']
 };
 
 const commonSkillsList = [
@@ -2530,163 +2276,163 @@ const commonSkillsList = [
 
 const courseRecommendations = {
     'python': [
-        { name: 'Python Tutorial for Beginners â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '8M+ views', url: 'https://www.youtube.com/watch?v=gfDE2a7MKjA', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'Python Full Course â€“ Apna College (Hindi)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=ERCMXc8x7mc', price: 'Free', ytChannel: 'Apna College' },
+        { name: 'Python Tutorial for Beginners – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '8M+ views', url: 'https://www.youtube.com/watch?v=gfDE2a7MKjA', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'Python Full Course – Apna College (Hindi)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=ERCMXc8x7mc', price: 'Free', ytChannel: 'Apna College' },
         { name: '100 Days of Code: Python Bootcamp', platform: 'Udemy', rating: '4.7 ★ (180k reviews)', url: 'https://www.udemy.com/course/100-days-of-code/', price: 'Top Rated' },
-        { name: 'Python for Everybody â€“ Dr. Chuck', platform: 'Coursera', rating: '4.8 ★ (220k reviews)', url: 'https://www.coursera.org/specializations/python', price: 'Free to Audit' }
+        { name: 'Python for Everybody – Dr. Chuck', platform: 'Coursera', rating: '4.8 ★ (220k reviews)', url: 'https://www.coursera.org/specializations/python', price: 'Free to Audit' }
     ],
     'javascript': [
-        { name: 'Namaste JavaScript â€“ Akshay Saini (Hindi/English)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/playlist?list=PLlasXeu85E9cQ32gLCvAvr9vNaUccPVNP', price: 'Free', ytChannel: 'Akshay Saini' },
-        { name: 'JavaScript Tutorial â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=hKB-YGF14SY', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'Namaste JavaScript – Akshay Saini (Hindi/English)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/playlist?list=PLlasXeu85E9cQ32gLCvAvr9vNaUccPVNP', price: 'Free', ytChannel: 'Akshay Saini' },
+        { name: 'JavaScript Tutorial – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=hKB-YGF14SY', price: 'Free', ytChannel: 'CodeWithHarry' },
         { name: 'The Complete JavaScript Course 2025', platform: 'Udemy', rating: '4.7 ★ (190k reviews)', url: 'https://www.udemy.com/course/the-complete-javascript-course/', price: 'Top Rated' }
     ],
     'typescript': [
-        { name: 'TypeScript Full Course â€“ Hitesh Choudhary (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=30LWjhZzg50', price: 'Free', ytChannel: 'Chai aur Code' },
-        { name: 'TypeScript Tutorial â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '800k+ views', url: 'https://www.youtube.com/watch?v=GinmHZ1jGBk', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'TypeScript Full Course – Hitesh Choudhary (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=30LWjhZzg50', price: 'Free', ytChannel: 'Chai aur Code' },
+        { name: 'TypeScript Tutorial – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '800k+ views', url: 'https://www.youtube.com/watch?v=GinmHZ1jGBk', price: 'Free', ytChannel: 'CodeWithHarry' },
         { name: 'Understanding TypeScript', platform: 'Udemy', rating: '4.7 ★ (60k reviews)', url: 'https://www.udemy.com/course/understanding-typescript/', price: 'Best Seller' }
     ],
     'react': [
-        { name: 'React JS Full Course â€“ Hitesh Choudhary (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/playlist?list=PLu71SKxNbfoDqgPchmvIsL4hTnJIrtige', price: 'Free', ytChannel: 'Chai aur Code' },
-        { name: 'React JS â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=RGKi6LSPDLU', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'React â€“ Thapa Technical (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=fOFVGCNxhEA', price: 'Free', ytChannel: 'Thapa Technical' },
+        { name: 'React JS Full Course – Hitesh Choudhary (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/playlist?list=PLu71SKxNbfoDqgPchmvIsL4hTnJIrtige', price: 'Free', ytChannel: 'Chai aur Code' },
+        { name: 'React JS – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=RGKi6LSPDLU', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'React – Thapa Technical (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=fOFVGCNxhEA', price: 'Free', ytChannel: 'Thapa Technical' },
         { name: 'React - The Complete Guide', platform: 'Udemy', rating: '4.6 ★ (150k reviews)', url: 'https://www.udemy.com/course/react-the-complete-guide-incl-redux/', price: 'Best Seller' }
     ],
     'angular': [
-        { name: 'Angular Tutorial â€“ Thapa Technical (Hindi)', platform: 'YouTube', rating: '1.5M+ views', url: 'https://www.youtube.com/playlist?list=PLwGdqUZWnOp3Vqf1n8QjRMhqwM-j7HGkQ', price: 'Free', ytChannel: 'Thapa Technical' },
-        { name: 'Angular â€“ The Complete Guide', platform: 'Udemy', rating: '4.6 ★ (80k reviews)', url: 'https://www.udemy.com/course/the-complete-guide-to-angular-2/', price: 'Best Seller' }
+        { name: 'Angular Tutorial – Thapa Technical (Hindi)', platform: 'YouTube', rating: '1.5M+ views', url: 'https://www.youtube.com/playlist?list=PLwGdqUZWnOp3Vqf1n8QjRMhqwM-j7HGkQ', price: 'Free', ytChannel: 'Thapa Technical' },
+        { name: 'Angular – The Complete Guide', platform: 'Udemy', rating: '4.6 ★ (80k reviews)', url: 'https://www.udemy.com/course/the-complete-guide-to-angular-2/', price: 'Best Seller' }
     ],
     'vue': [
-        { name: 'Vue JS Crash Course â€“ Traversy Media', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=Wy9q22isx3U', price: 'Free', ytChannel: 'Traversy Media' },
+        { name: 'Vue JS Crash Course – Traversy Media', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=Wy9q22isx3U', price: 'Free', ytChannel: 'Traversy Media' },
         { name: 'Vue - The Complete Guide', platform: 'Udemy', rating: '4.7 ★ (65k reviews)', url: 'https://www.udemy.com/course/vuejs-2-the-complete-guide/', price: 'Best Seller' }
     ],
     'node.js': [
-        { name: 'Node.js Tutorial â€“ Sheryians Coding School (Hindi)', platform: 'YouTube', rating: '1.5M+ views', url: 'https://www.youtube.com/watch?v=y18ubz7gOsQ', price: 'Free', ytChannel: 'Sheryians Coding School' },
-        { name: 'Node.js Backend â€“ Hitesh Choudhary (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/playlist?list=PLu71SKxNbfoBGh_8p_NS-ZAh6Rl8CIvX3', price: 'Free', ytChannel: 'Chai aur Code' },
-        { name: 'NodeJS â€“ The Complete Guide', platform: 'Udemy', rating: '4.7 ★ (100k reviews)', url: 'https://www.udemy.com/course/nodejs-the-complete-guide/', price: 'Best Seller' }
+        { name: 'Node.js Tutorial – Sheryians Coding School (Hindi)', platform: 'YouTube', rating: '1.5M+ views', url: 'https://www.youtube.com/watch?v=y18ubz7gOsQ', price: 'Free', ytChannel: 'Sheryians Coding School' },
+        { name: 'Node.js Backend – Hitesh Choudhary (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/playlist?list=PLu71SKxNbfoBGh_8p_NS-ZAh6Rl8CIvX3', price: 'Free', ytChannel: 'Chai aur Code' },
+        { name: 'NodeJS – The Complete Guide', platform: 'Udemy', rating: '4.7 ★ (100k reviews)', url: 'https://www.udemy.com/course/nodejs-the-complete-guide/', price: 'Best Seller' }
     ],
     'mongodb': [
-        { name: 'MongoDB Tutorial â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=oSIv-E60NiU', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'MongoDB â€“ The Complete Developer Guide', platform: 'Udemy', rating: '4.6 ★ (45k reviews)', url: 'https://www.udemy.com/course/mongodb-the-complete-developers-guide/', price: 'Best Seller' }
+        { name: 'MongoDB Tutorial – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=oSIv-E60NiU', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'MongoDB – The Complete Developer Guide', platform: 'Udemy', rating: '4.6 ★ (45k reviews)', url: 'https://www.udemy.com/course/mongodb-the-complete-developers-guide/', price: 'Best Seller' }
     ],
     'django': [
-        { name: 'Django Full Course â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=JxzZxdht-XY', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'Python Django â€“ The Practical Guide', platform: 'Udemy', rating: '4.7 ★ (25k reviews)', url: 'https://www.udemy.com/course/python-django-the-practical-guide/', price: 'Best Seller' }
+        { name: 'Django Full Course – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=JxzZxdht-XY', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'Python Django – The Practical Guide', platform: 'Udemy', rating: '4.7 ★ (25k reviews)', url: 'https://www.udemy.com/course/python-django-the-practical-guide/', price: 'Best Seller' }
     ],
     'flask': [
-        { name: 'Flask Tutorial â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=oA8brF3w5XQ', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'Flask Tutorial – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=oA8brF3w5XQ', price: 'Free', ytChannel: 'CodeWithHarry' },
         { name: 'REST APIs with Flask & Python', platform: 'Udemy', rating: '4.7 ★ (30k reviews)', url: 'https://www.udemy.com/course/rest-api-flask-and-python/', price: 'Best Seller' }
     ],
     'machine learning': [
-        { name: 'Machine Learning â€“ CampusX (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=ZftI2fEz0Fw', price: 'Free', ytChannel: 'CampusX' },
-        { name: 'ML Tutorial â€“ codebasics (Hindi/English)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLeo1K3hjS3uvCeTYTeyfe0-rN5r8zn9rw', price: 'Free', ytChannel: 'codebasics' },
-        { name: 'Machine Learning Specialization â€“ Andrew Ng', platform: 'Coursera', rating: '4.9 ★ (340k reviews)', url: 'https://www.coursera.org/specializations/machine-learning-introduction', price: 'Top Recommended' }
+        { name: 'Machine Learning – CampusX (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=ZftI2fEz0Fw', price: 'Free', ytChannel: 'CampusX' },
+        { name: 'ML Tutorial – codebasics (Hindi/English)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLeo1K3hjS3uvCeTYTeyfe0-rN5r8zn9rw', price: 'Free', ytChannel: 'codebasics' },
+        { name: 'Machine Learning Specialization – Andrew Ng', platform: 'Coursera', rating: '4.9 ★ (340k reviews)', url: 'https://www.coursera.org/specializations/machine-learning-introduction', price: 'Top Recommended' }
     ],
     'deep learning': [
-        { name: 'Deep Learning â€“ CampusX (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=1VSZtNYMntM', price: 'Free', ytChannel: 'CampusX' },
-        { name: 'Deep Learning Specialization â€“ Andrew Ng', platform: 'Coursera', rating: '4.9 ★ (150k reviews)', url: 'https://www.coursera.org/specializations/deep-learning', price: 'Top Recommended' }
+        { name: 'Deep Learning – CampusX (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=1VSZtNYMntM', price: 'Free', ytChannel: 'CampusX' },
+        { name: 'Deep Learning Specialization – Andrew Ng', platform: 'Coursera', rating: '4.9 ★ (150k reviews)', url: 'https://www.coursera.org/specializations/deep-learning', price: 'Top Recommended' }
     ],
     'data science': [
-        { name: 'Data Science Full Course â€“ CampusX (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLKnIA16_RmvbAlyx4_rdtR66B7EHX5k3z', price: 'Free', ytChannel: 'CampusX' },
-        { name: 'Data Science â€“ codebasics (Hindi/English)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=3xw3SnFBRNs', price: 'Free', ytChannel: 'codebasics' },
+        { name: 'Data Science Full Course – CampusX (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLKnIA16_RmvbAlyx4_rdtR66B7EHX5k3z', price: 'Free', ytChannel: 'CampusX' },
+        { name: 'Data Science – codebasics (Hindi/English)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=3xw3SnFBRNs', price: 'Free', ytChannel: 'codebasics' },
         { name: 'Data Science A-Z', platform: 'Udemy', rating: '4.6 ★ (110k reviews)', url: 'https://www.udemy.com/course/datascience/', price: 'Best Seller' }
     ],
     'data structures': [
-        { name: 'DSA Series â€“ Striver/TakeUForward (Hindi/English)', platform: 'YouTube', rating: '6M+ views', url: 'https://www.youtube.com/playlist?list=PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz', price: 'Free', ytChannel: 'take U forward' },
-        { name: 'DSA in Java â€“ Kunal Kushwaha (Hindi/English)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/playlist?list=PL9gnSGHSqcnr_DxHsP7AW9ftq0AtAyYqJ', price: 'Free', ytChannel: 'Kunal Kushwaha' },
-        { name: 'DSA â€“ Love Babbar (Hindi)', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/playlist?list=PLDzeHZWIZsTryvtXdMr6rPh4IDexB5NIA', price: 'Free', ytChannel: 'Love Babbar' },
+        { name: 'DSA Series – Striver/TakeUForward (Hindi/English)', platform: 'YouTube', rating: '6M+ views', url: 'https://www.youtube.com/playlist?list=PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz', price: 'Free', ytChannel: 'take U forward' },
+        { name: 'DSA in Java – Kunal Kushwaha (Hindi/English)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/playlist?list=PL9gnSGHSqcnr_DxHsP7AW9ftq0AtAyYqJ', price: 'Free', ytChannel: 'Kunal Kushwaha' },
+        { name: 'DSA – Love Babbar (Hindi)', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/playlist?list=PLDzeHZWIZsTryvtXdMr6rPh4IDexB5NIA', price: 'Free', ytChannel: 'Love Babbar' },
         { name: 'Master DSA: Interview Prep', platform: 'Udemy', rating: '4.7 ★ (85k reviews)', url: 'https://www.udemy.com/course/master-the-coding-interview-data-structures-algorithms/', price: 'Best Seller' }
     ],
     'algorithms': [
-        { name: 'Algorithms â€“ Abdul Bari (English)', platform: 'YouTube', rating: '10M+ views', url: 'https://www.youtube.com/playlist?list=PLDN4rrl48XKpZkf03iYFl-O29szjTrs_O', price: 'Free', ytChannel: 'Abdul Bari' },
-        { name: 'Algorithms Specialization â€“ Stanford', platform: 'Coursera', rating: '4.8 ★ (35k reviews)', url: 'https://www.coursera.org/specializations/algorithms', price: 'Free to Audit' }
+        { name: 'Algorithms – Abdul Bari (English)', platform: 'YouTube', rating: '10M+ views', url: 'https://www.youtube.com/playlist?list=PLDN4rrl48XKpZkf03iYFl-O29szjTrs_O', price: 'Free', ytChannel: 'Abdul Bari' },
+        { name: 'Algorithms Specialization – Stanford', platform: 'Coursera', rating: '4.8 ★ (35k reviews)', url: 'https://www.coursera.org/specializations/algorithms', price: 'Free to Audit' }
     ],
     'system design': [
-        { name: 'System Design â€“ Gaurav Sen (English)', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/playlist?list=PLMCXHnjXnTnvo6alSjVkgxV-VH6EPyvoX', price: 'Free', ytChannel: 'Gaurav Sen' },
-        { name: 'System Design â€“ Shrayansh Jain (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=0163cssUxLA', price: 'Free', ytChannel: 'Shrayansh Jain' },
+        { name: 'System Design – Gaurav Sen (English)', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/playlist?list=PLMCXHnjXnTnvo6alSjVkgxV-VH6EPyvoX', price: 'Free', ytChannel: 'Gaurav Sen' },
+        { name: 'System Design – Shrayansh Jain (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=0163cssUxLA', price: 'Free', ytChannel: 'Shrayansh Jain' },
         { name: 'System Design Interview Guide', platform: 'Udemy', rating: '4.6 ★ (15k reviews)', url: 'https://www.udemy.com/course/system-design-interview-guide/', price: 'Highly Rated' }
     ],
     'sql': [
-        { name: 'SQL Tutorial â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=hlGoQC332VM', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'SQL Full Course â€“ Apna College (Hindi)', platform: 'YouTube', rating: '1.5M+ views', url: 'https://www.youtube.com/watch?v=7S_tz1z_5bA', price: 'Free', ytChannel: 'Apna College' },
+        { name: 'SQL Tutorial – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=hlGoQC332VM', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'SQL Full Course – Apna College (Hindi)', platform: 'YouTube', rating: '1.5M+ views', url: 'https://www.youtube.com/watch?v=7S_tz1z_5bA', price: 'Free', ytChannel: 'Apna College' },
         { name: 'The Complete SQL Bootcamp', platform: 'Udemy', rating: '4.7 ★ (170k reviews)', url: 'https://www.udemy.com/course/the-complete-sql-bootcamp/', price: 'Best Seller' }
     ],
     'git': [
-        { name: 'Git & GitHub â€“ Kunal Kushwaha (Hindi/English)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=apGV9Kg7ics', price: 'Free', ytChannel: 'Kunal Kushwaha' },
-        { name: 'Git & GitHub Tutorial â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=gwWKnnCMQ5c', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'Git & GitHub – Kunal Kushwaha (Hindi/English)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=apGV9Kg7ics', price: 'Free', ytChannel: 'Kunal Kushwaha' },
+        { name: 'Git & GitHub Tutorial – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=gwWKnnCMQ5c', price: 'Free', ytChannel: 'CodeWithHarry' },
         { name: 'Git & GitHub Complete Guide', platform: 'Udemy', rating: '4.7 ★ (45k reviews)', url: 'https://www.udemy.com/course/git-and-github-complete-guide/', price: 'Best Seller' }
     ],
     'docker': [
-        { name: 'Docker Tutorial â€“ Abhishek Veeramalla (Hindi/English)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/playlist?list=PLdpzxOOAlwvIKMjOl0YEzAa9VhMusFnFt', price: 'Free', ytChannel: 'Abhishek Veeramalla' },
-        { name: 'Docker Tutorial â€“ TechWorld with Nana', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=3c-iBn73dDE', price: 'Free', ytChannel: 'TechWorld with Nana' },
+        { name: 'Docker Tutorial – Abhishek Veeramalla (Hindi/English)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/playlist?list=PLdpzxOOAlwvIKMjOl0YEzAa9VhMusFnFt', price: 'Free', ytChannel: 'Abhishek Veeramalla' },
+        { name: 'Docker Tutorial – TechWorld with Nana', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=3c-iBn73dDE', price: 'Free', ytChannel: 'TechWorld with Nana' },
         { name: 'Docker & Kubernetes: The Practical Guide', platform: 'Udemy', rating: '4.8 ★ (65k reviews)', url: 'https://www.udemy.com/course/docker-kubernetes-the-practical-guide/', price: 'Best Seller' }
     ],
     'kubernetes': [
-        { name: 'Kubernetes â€“ Abhishek Veeramalla (Hindi/English)', platform: 'YouTube', rating: '1.5M+ views', url: 'https://www.youtube.com/playlist?list=PLdpzxOOAlwvIKMjOl0YEzAa9VhMusFnFt', price: 'Free', ytChannel: 'Abhishek Veeramalla' },
-        { name: 'Kubernetes â€“ TechWorld with Nana', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/watch?v=X48VuDVv0do', price: 'Free', ytChannel: 'TechWorld with Nana' },
+        { name: 'Kubernetes – Abhishek Veeramalla (Hindi/English)', platform: 'YouTube', rating: '1.5M+ views', url: 'https://www.youtube.com/playlist?list=PLdpzxOOAlwvIKMjOl0YEzAa9VhMusFnFt', price: 'Free', ytChannel: 'Abhishek Veeramalla' },
+        { name: 'Kubernetes – TechWorld with Nana', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/watch?v=X48VuDVv0do', price: 'Free', ytChannel: 'TechWorld with Nana' },
         { name: 'CKA with Practice Tests', platform: 'Udemy', rating: '4.8 ★ (80k reviews)', url: 'https://www.udemy.com/course/certified-kubernetes-administrator-with-practice-tests/', price: 'Best Seller' }
     ],
     'devops': [
-        { name: 'DevOps Zero to Hero â€“ Abhishek Veeramalla (Hindi/English)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLdpzxOOAlwvIKMjOl0YEzAa9VhMusFnFt', price: 'Free', ytChannel: 'Abhishek Veeramalla' },
-        { name: 'DevOps Bootcamp â€“ TrainWithShubham (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=0Gh6kQSmUTE', price: 'Free', ytChannel: 'TrainWithShubham' },
+        { name: 'DevOps Zero to Hero – Abhishek Veeramalla (Hindi/English)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLdpzxOOAlwvIKMjOl0YEzAa9VhMusFnFt', price: 'Free', ytChannel: 'Abhishek Veeramalla' },
+        { name: 'DevOps Bootcamp – TrainWithShubham (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=0Gh6kQSmUTE', price: 'Free', ytChannel: 'TrainWithShubham' },
         { name: 'DevOps Beginners to Advanced', platform: 'Udemy', rating: '4.7 ★ (35k reviews)', url: 'https://www.udemy.com/course/decodingdevops/', price: 'Best Seller' }
     ],
     'aws': [
-        { name: 'AWS Zero to Hero â€“ Abhishek Veeramalla (Hindi/English)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/playlist?list=PLdpzxOOAlwvIKMjOl0YEzAa9VhMusFnFt', price: 'Free', ytChannel: 'Abhishek Veeramalla' },
-        { name: 'AWS Tutorial â€“ Intellipaat (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=k1RI5locZE4', price: 'Free', ytChannel: 'Intellipaat' },
+        { name: 'AWS Zero to Hero – Abhishek Veeramalla (Hindi/English)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/playlist?list=PLdpzxOOAlwvIKMjOl0YEzAa9VhMusFnFt', price: 'Free', ytChannel: 'Abhishek Veeramalla' },
+        { name: 'AWS Tutorial – Intellipaat (Hindi)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=k1RI5locZE4', price: 'Free', ytChannel: 'Intellipaat' },
         { name: 'Ultimate AWS Cloud Practitioner', platform: 'Udemy', rating: '4.7 ★ (140k reviews)', url: 'https://www.udemy.com/course/aws-certified-cloud-practitioner-new/', price: 'Top Rated' }
     ],
     'networking': [
-        { name: 'Computer Networks â€“ Gate Smashers (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLxCzCOWd7aiGFBD2-2joCpWOLUrDLvVV_', price: 'Free', ytChannel: 'Gate Smashers' },
-        { name: 'Networking Full Course â€“ Kunal Kushwaha (Hindi/English)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=IPvYjXCsTg8', price: 'Free', ytChannel: 'Kunal Kushwaha' }
+        { name: 'Computer Networks – Gate Smashers (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLxCzCOWd7aiGFBD2-2joCpWOLUrDLvVV_', price: 'Free', ytChannel: 'Gate Smashers' },
+        { name: 'Networking Full Course – Kunal Kushwaha (Hindi/English)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=IPvYjXCsTg8', price: 'Free', ytChannel: 'Kunal Kushwaha' }
     ],
     'c++': [
-        { name: 'C++ Full Course â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '8M+ views', url: 'https://www.youtube.com/watch?v=j8nAHeVKL08', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'C++ Tutorial â€“ Apna College (Hindi)', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/watch?v=z9bZufPHFLU', price: 'Free', ytChannel: 'Apna College' },
-        { name: 'DSA in C++ â€“ Love Babbar (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLDzeHZWIZsTryvtXdMr6rPh4IDexB5NIA', price: 'Free', ytChannel: 'Love Babbar' }
+        { name: 'C++ Full Course – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '8M+ views', url: 'https://www.youtube.com/watch?v=j8nAHeVKL08', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'C++ Tutorial – Apna College (Hindi)', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/watch?v=z9bZufPHFLU', price: 'Free', ytChannel: 'Apna College' },
+        { name: 'DSA in C++ – Love Babbar (Hindi)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLDzeHZWIZsTryvtXdMr6rPh4IDexB5NIA', price: 'Free', ytChannel: 'Love Babbar' }
     ],
     'java': [
-        { name: 'Java Full Course â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '7M+ views', url: 'https://www.youtube.com/watch?v=UmnCZ7-9yDY', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'Java Full Course â€“ Kunal Kushwaha (Hindi/English)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=rZ41y93P2Qo', price: 'Free', ytChannel: 'Kunal Kushwaha' },
+        { name: 'Java Full Course – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '7M+ views', url: 'https://www.youtube.com/watch?v=UmnCZ7-9yDY', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'Java Full Course – Kunal Kushwaha (Hindi/English)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=rZ41y93P2Qo', price: 'Free', ytChannel: 'Kunal Kushwaha' },
         { name: 'Java Masterclass', platform: 'Udemy', rating: '4.7 ★ (120k reviews)', url: 'https://www.udemy.com/course/java-the-complete-java-developer-course/', price: 'Best Seller' }
     ],
     'html': [
-        { name: 'HTML & CSS Full Course â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '10M+ views', url: 'https://www.youtube.com/watch?v=BsDoLVMnmZs', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'HTML Full Course â€“ Sheryians Coding School (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=k7ELO356Npo', price: 'Free', ytChannel: 'Sheryians Coding School' }
+        { name: 'HTML & CSS Full Course – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '10M+ views', url: 'https://www.youtube.com/watch?v=BsDoLVMnmZs', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'HTML Full Course – Sheryians Coding School (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=k7ELO356Npo', price: 'Free', ytChannel: 'Sheryians Coding School' }
     ],
     'css': [
-        { name: 'CSS Full Course â€“ CodeWithHarry (Hindi)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=Edsxf_NBFrw', price: 'Free', ytChannel: 'CodeWithHarry' },
-        { name: 'CSS Flexbox & Grid â€“ Sheryians Coding School (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=jDDaOFr9nqQ', price: 'Free', ytChannel: 'Sheryians Coding School' }
+        { name: 'CSS Full Course – CodeWithHarry (Hindi)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=Edsxf_NBFrw', price: 'Free', ytChannel: 'CodeWithHarry' },
+        { name: 'CSS Flexbox & Grid – Sheryians Coding School (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=jDDaOFr9nqQ', price: 'Free', ytChannel: 'Sheryians Coding School' }
     ],
     'tensorflow': [
-        { name: 'TensorFlow â€“ CampusX (Hindi)', platform: 'YouTube', rating: '500k+ views', url: 'https://www.youtube.com/watch?v=Mubj_fqiAv8', price: 'Free', ytChannel: 'CampusX' },
-        { name: 'TensorFlow 2 & Keras â€“ Daniel Bourke', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=tpCFfeUEGs8', price: 'Free', ytChannel: 'Daniel Bourke' }
+        { name: 'TensorFlow – CampusX (Hindi)', platform: 'YouTube', rating: '500k+ views', url: 'https://www.youtube.com/watch?v=Mubj_fqiAv8', price: 'Free', ytChannel: 'CampusX' },
+        { name: 'TensorFlow 2 & Keras – Daniel Bourke', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=tpCFfeUEGs8', price: 'Free', ytChannel: 'Daniel Bourke' }
     ],
     'figma': [
-        { name: 'Figma UI/UX Design â€“ DesignCourse', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=jwCmIBJ8Jtc', price: 'Free', ytChannel: 'DesignCourse' },
-        { name: 'UI/UX â€“ Figma Masterclass', platform: 'Udemy', rating: '4.6 ★ (50k reviews)', url: 'https://www.udemy.com/course/learn-figma/', price: 'Best Seller' }
+        { name: 'Figma UI/UX Design – DesignCourse', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=jwCmIBJ8Jtc', price: 'Free', ytChannel: 'DesignCourse' },
+        { name: 'UI/UX – Figma Masterclass', platform: 'Udemy', rating: '4.6 ★ (50k reviews)', url: 'https://www.udemy.com/course/learn-figma/', price: 'Best Seller' }
     ],
     'excel': [
-        { name: 'Excel Tutorial â€“ Trump Excel (English)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=Vl0H-qTclOg', price: 'Free', ytChannel: 'Trump Excel' },
-        { name: 'Microsoft Excel â€“ Zero to Hero', platform: 'Udemy', rating: '4.6 ★ (140k reviews)', url: 'https://www.udemy.com/course/microsoft-excel-2013-from-beginner-to-advanced-and-beyond/', price: 'Best Seller' }
+        { name: 'Excel Tutorial – Trump Excel (English)', platform: 'YouTube', rating: '5M+ views', url: 'https://www.youtube.com/watch?v=Vl0H-qTclOg', price: 'Free', ytChannel: 'Trump Excel' },
+        { name: 'Microsoft Excel – Zero to Hero', platform: 'Udemy', rating: '4.6 ★ (140k reviews)', url: 'https://www.udemy.com/course/microsoft-excel-2013-from-beginner-to-advanced-and-beyond/', price: 'Best Seller' }
     ],
     'power bi': [
-        { name: 'Power BI Tutorial â€“ codebasics (Hindi/English)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLeo1K3hjS3uva8pk1FI3iK9kCOOS2bHIH', price: 'Free', ytChannel: 'codebasics' },
+        { name: 'Power BI Tutorial – codebasics (Hindi/English)', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/playlist?list=PLeo1K3hjS3uva8pk1FI3iK9kCOOS2bHIH', price: 'Free', ytChannel: 'codebasics' },
         { name: 'Microsoft Power BI Desktop', platform: 'Udemy', rating: '4.6 ★ (85k reviews)', url: 'https://www.udemy.com/course/microsoft-power-bi-up-running-with-power-bi-desktop/', price: 'Best Seller' }
     ],
     'tableau': [
-        { name: 'Tableau Full Course â€“ Simplilearn (English)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=TPMlZxRRaBQ', price: 'Free', ytChannel: 'Simplilearn' },
+        { name: 'Tableau Full Course – Simplilearn (English)', platform: 'YouTube', rating: '2M+ views', url: 'https://www.youtube.com/watch?v=TPMlZxRRaBQ', price: 'Free', ytChannel: 'Simplilearn' },
         { name: 'Tableau Training', platform: 'Udemy', rating: '4.5 ★ (50k reviews)', url: 'https://www.udemy.com/course/tableau10/', price: 'Best Seller' }
     ],
     'communication': [
-        { name: 'Spoken English â€“ Dhruv Rathee (Hindi)', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/watch?v=FSl0hU6iFac', price: 'Free', ytChannel: 'Dhruv Rathee' },
-        { name: 'Public Speaking â€“ TED on Coursera', platform: 'Coursera', rating: '4.8 ★ (30k reviews)', url: 'https://www.coursera.org/learn/public-speaking', price: 'Free to Audit' }
+        { name: 'Spoken English – Dhruv Rathee (Hindi)', platform: 'YouTube', rating: '4M+ views', url: 'https://www.youtube.com/watch?v=FSl0hU6iFac', price: 'Free', ytChannel: 'Dhruv Rathee' },
+        { name: 'Public Speaking – TED on Coursera', platform: 'Coursera', rating: '4.8 ★ (30k reviews)', url: 'https://www.coursera.org/learn/public-speaking', price: 'Free to Audit' }
     ],
     'leadership': [
-        { name: 'Leadership & Management â€“ Great Learning (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=N0RKHSt5MCw', price: 'Free', ytChannel: 'Great Learning' },
+        { name: 'Leadership & Management – Great Learning (Hindi)', platform: 'YouTube', rating: '1M+ views', url: 'https://www.youtube.com/watch?v=N0RKHSt5MCw', price: 'Free', ytChannel: 'Great Learning' },
         { name: 'Leadership Development Specialization', platform: 'Coursera', rating: '4.8 ★ (50k reviews)', url: 'https://www.coursera.org/specializations/leadership-development-for-engineers', price: 'Free to Audit' }
     ],
     'marketing': [
-        { name: 'Digital Marketing Full Course â€“ Google Digital Garage', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=VoX97altFMg', price: 'Free', ytChannel: 'Google Digital Garage' },
+        { name: 'Digital Marketing Full Course – Google Digital Garage', platform: 'YouTube', rating: '3M+ views', url: 'https://www.youtube.com/watch?v=VoX97altFMg', price: 'Free', ytChannel: 'Google Digital Garage' },
         { name: 'Digital Marketing Masterclass', platform: 'Udemy', rating: '4.5 ★ (100k reviews)', url: 'https://www.udemy.com/course/digital-marketing-masterclass-course/', price: 'Best Seller' }
     ]
 };
@@ -2772,10 +2518,10 @@ function showSkillGapSection(targetRole, flow) {
         window.scrollTo({ top: skillGap.offsetTop - 80, behavior: 'smooth' });
     }
 
-    showToast('Skill Gap Analyser ready! Enter your target role and click Analyse. ');
+    showToast('Skill Gap Analyser ready! Enter your target role and click Analyse. 🎯');
 }
 
-// Close skill gap modal (scratch flow) - return to step 4 preview
+// Close skill gap modal (scratch flow) — return to step 4 preview
 function closeSkillGapModal() {
     const skillGap = document.getElementById('skillGap');
     skillGap.classList.add('hidden');
@@ -2784,10 +2530,9 @@ function closeSkillGapModal() {
     window.scrollTo({ top: document.getElementById('builder').offsetTop - 100, behavior: 'smooth' });
 }
 
-async function runGapAnalysis() {
+function runGapAnalysis() {
     const roleInput = document.getElementById('gapRoleInput').value.trim();
     const jdInput = document.getElementById('gapJdInput').value.trim();
-    const runBtn = document.getElementById('runGapBtn');
 
     if (!roleInput) {
         showToast('Please enter a target job role.');
@@ -2800,35 +2545,8 @@ async function runGapAnalysis() {
     if (matchedRole) {
         reqSkills = [...roleSkillsMap[matchedRole]];
     } else {
-        // Role isn't in our hardcoded map (e.g. "Wedding Videographer",
-        // "Podcast Editor") - ask the AI for the right skills for THIS
-        // specific role instead of assuming it's a software job.
-        const origBtnHTML = runBtn.innerHTML;
-        runBtn.disabled = true;
-        runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analysing role...';
-        try {
-            const resp = await fetch('/api/role-skills', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ role: roleInput })
-            });
-            if (resp.ok) {
-                const data = await resp.json();
-                reqSkills = data.skills || [];
-            }
-        } catch (e) {
-            console.error('role-skills fetch failed', e);
-        }
-        runBtn.disabled = false;
-        runBtn.innerHTML = origBtnHTML;
-
-        // Only if the AI lookup genuinely failed (offline / no API key) do we
-        // fall back to a generic list - and we say so, rather than pretending
-        // it's role-specific.
-        if (reqSkills.length === 0) {
-            reqSkills = ['Communication', 'Problem Solving', 'Project Management', 'Adaptability', 'Time Management'];
-            showToast('Could not fetch AI-matched skills for this role - showing generic core skills instead.');
-        }
+        // Default core skills if no role match
+        reqSkills = ['Git', 'Communication', 'Problem Solving', 'Data Analysis', 'Project Management'];
     }
 
     // Extract skills from JD if provided
@@ -2889,9 +2607,9 @@ async function runGapAnalysis() {
     document.getElementById('atsScoreNum').textContent = score;
     
     let atsLabel = 'Low Fit';
-    if (score >= 80) atsLabel = 'Excellent Fit ';
-    else if (score >= 60) atsLabel = 'Good Fit ';
-    else if (score >= 40) atsLabel = 'Moderate Fit  ï¸';
+    if (score >= 80) atsLabel = 'Excellent Fit 🚀';
+    else if (score >= 60) atsLabel = 'Good Fit 👍';
+    else if (score >= 40) atsLabel = 'Moderate Fit ⚠️';
     document.getElementById('atsLabel').textContent = atsLabel;
     document.getElementById('atsMatched').textContent = `${matched.length} of ${reqSkills.length} skills matched`;
 
@@ -2905,7 +2623,7 @@ async function runGapAnalysis() {
     const gapList = document.getElementById('gapSkillsList');
     gapList.innerHTML = missing.length > 0
         ? missing.map(s => `<span class="gap-skill-chip"><i class="fas fa-exclamation-triangle"></i> ${s}</span>`).join('')
-        : '<p style="font-size:0.8rem;color:var(--gray);">No missing skills! You are a perfect match. ';
+        : '<p style="font-size:0.8rem;color:var(--gray);">No missing skills! You are a perfect match. 🎉</p>';
 
     // Recommend Courses
     renderCourseRecommendations(missing);
@@ -2938,7 +2656,7 @@ function renderCourseRecommendations(missingSkills) {
         if (!courses) {
             courses = [
                 {
-                    name: `${skill} Full Course (Hindi) â€“ YouTube Search`,
+                    name: `${skill} Full Course (Hindi) – YouTube Search`,
                     platform: 'YouTube',
                     rating: 'Free Hindi/English Videos',
                     url: `https://www.youtube.com/results?search_query=${encodeURIComponent(skill)}+full+course+hindi`,
@@ -3018,7 +2736,7 @@ async function generateAIRoadmap() {
     generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Roadmap...';
     roadmapBox.innerHTML = '<div class="roadmap-loading"><i class="fas fa-cog fa-spin"></i> AI is constructing your weekly learning roadmap...</div>';
 
-    const prompt = `You are a world-class mentor in the exact field of "${role}" - infer whether this is a technical, creative, or business role from the title itself, and stay strictly within that field's real tools and practices. The student wants to become a "${role}" but currently lacks these specific skills:\n${missing.join(', ') || 'core skills for this role'}\n\nPlease generate a highly detailed, practical, week-by-week 3-month (12 weeks) learning roadmap in clean, readable text, built ONLY around the listed missing skills and this specific field. Do not include generic unrelated topics (e.g. Git, software data structures, or generic hackathons) unless they are genuinely part of "${role}" work. Format it clearly, with week ranges, objectives, recommended projects, and milestones. Do not write any HTML tags. Use plain text formatting only. Start directly with the roadmap title.`;
+    const prompt = `You are a world-class technical mentor. The student wants to become a "${role}" but lacks the following skills:\n${missing.join(', ') || 'Advanced Tech Concepts'}\n\nPlease generate a highly detailed, practical, week-by-week 3-month (12 weeks) learning roadmap in clean, readable text. Format it clearly, with week ranges, objectives, recommended projects, and milestones. Do not write any HTML tags. Use plain text formatting only. Start directly with the roadmap title.`;
 
     try {
         const response = await fetch('/api/ai-write', {
@@ -3030,7 +2748,7 @@ async function generateAIRoadmap() {
         const resData = await response.json();
         
         roadmapBox.innerHTML = `<pre class="roadmap-text">${resData.content}</pre>`;
-        showToast('Roadmap generated successfully! ');
+        showToast('Roadmap generated successfully! 🚀');
     } catch (e) {
         console.error(e);
         roadmapBox.innerHTML = '<p class="roadmap-hint" style="color:#ef4444;">Failed to generate AI roadmap. Please try again.</p>';
@@ -3096,7 +2814,7 @@ async function extractTextFromPDF(arrayBuffer) {
 }
 
 // ============================================
-// ENTRY FLOW: Choice Panel -> Upload / Scratch
+// ENTRY FLOW: Choice Panel → Upload / Scratch
 // ============================================
 function initEntryFlow() {
     const choiceUpload = document.getElementById('choiceUpload');
@@ -3105,39 +2823,24 @@ function initEntryFlow() {
     const pdfDropZone = document.getElementById('pdfDropZone');
     const pdfFileInput = document.getElementById('pdfFileInput');
 
-    const handleUploadClick = (e) => {
-        if (e) e.preventDefault();
-        const choicePanel = document.getElementById('choicePanel');
-        const uploadPanel = document.getElementById('uploadPanel');
-        if (choicePanel) choicePanel.classList.add('hidden');
-        if (uploadPanel) uploadPanel.classList.remove('hidden');
-        const builder = document.getElementById('builder');
-        if (builder) window.scrollTo({ top: builder.offsetTop - 80, behavior: 'smooth' });
-    };
-
-    const handleScratchClick = (e) => {
-        if (e) e.preventDefault();
-        state.flow = 'scratch';
-        state.totalSteps = 4;
-        const choicePanel = document.getElementById('choicePanel');
-        const mainStepper = document.getElementById('mainStepper');
-        if (choicePanel) choicePanel.classList.add('hidden');
-        if (mainStepper) mainStepper.classList.remove('hidden');
-        if (typeof goToStep === 'function') goToStep(1);
-    };
-
-    // Choice: Upload PDF (card or button inside)
+    // Choice: Upload PDF
     if (choiceUpload) {
-        choiceUpload.addEventListener('click', handleUploadClick);
-        const btn = choiceUpload.querySelector('.choice-btn');
-        if (btn) btn.addEventListener('click', handleUploadClick);
+        choiceUpload.addEventListener('click', () => {
+            document.getElementById('choicePanel').classList.add('hidden');
+            document.getElementById('uploadPanel').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('builder').offsetTop - 80, behavior: 'smooth' });
+        });
     }
 
-    // Choice: Create From Scratch (card or button inside)
+    // Choice: Create From Scratch
     if (choiceScratch) {
-        choiceScratch.addEventListener('click', handleScratchClick);
-        const btn = choiceScratch.querySelector('.choice-btn');
-        if (btn) btn.addEventListener('click', handleScratchClick);
+        choiceScratch.addEventListener('click', () => {
+            state.flow = 'scratch';
+            state.totalSteps = 4;
+            document.getElementById('choicePanel').classList.add('hidden');
+            document.getElementById('mainStepper').classList.remove('hidden');
+            goToStep(1);
+        });
     }
 
     // Back to choice from upload panel
@@ -3186,14 +2889,13 @@ async function handlePDFUpload(file) {
 
     pdfDropZone.style.display = 'none';
     uploadStatus.style.display = 'flex';
-    statusTitle.textContent = 'Uploading & Analyzing PDF Geometry...';
-    statusDesc.textContent = 'Executing 11-Stage Resume Intelligence Pipeline';
+    statusTitle.textContent = 'Uploading & extracting PDF...';
+    statusDesc.textContent = 'Using server-side extraction for best results';
 
     try {
         let rawText = '';
-        let serverMeta = null;
 
-        // ── Strategy 1: Production Resume Intelligence Engine (/api/extract-pdf) ──
+        // ── Strategy 1: server-side pdf-parse (most reliable) ──
         try {
             const formData = new FormData();
             formData.append('pdf', file);
@@ -3202,18 +2904,16 @@ async function handlePDFUpload(file) {
                 const serverData = await serverResp.json();
                 if (serverData.text && serverData.text.length > 50) {
                     rawText = serverData.text;
-                    serverMeta = serverData;
-                    statusDesc.textContent = `Extracted via ${serverData.parserUsed || 'PyMuPDF'} (Confidence: ${serverData.confidenceScore || 90}%)`;
-                    renderParsingIntelligenceCard(serverData);
+                    statusDesc.textContent = `Extracted ${serverData.pages} page(s) via server`;
                 }
             }
         } catch (serverErr) {
-            console.warn('Resume Intelligence Pipeline notice, trying client PDF.js:', serverErr.message);
+            console.warn('Server extraction failed, trying client-side:', serverErr.message);
         }
 
         // ── Strategy 2: client-side PDF.js fallback ──
         if (!rawText || rawText.length < 50) {
-            statusDesc.textContent = 'Executing client-side layout fallback...';
+            statusDesc.textContent = 'Trying client-side extraction...';
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 rawText = await extractTextFromPDF(arrayBuffer);
@@ -3226,86 +2926,48 @@ async function handlePDFUpload(file) {
             throw new Error('Could not extract text from this PDF. It may be image-based or password-protected. Please try a different PDF or copy-paste your resume text manually.');
         }
 
-        statusTitle.textContent = 'AI Structuring & Validating Resume...';
-        statusDesc.textContent = 'Parsing sections into standardized Resume JSON';
+        statusTitle.textContent = 'AI is structuring your resume...';
+        statusDesc.textContent = 'Parsing sections with Groq AI';
+
+        // Use AI to parse the raw text into structured JSON
+        const parsePrompt = `You are an expert resume parser. Extract ALL structured information from the following raw resume text and return it as a JSON object with these exact keys:\n{\n  "fullName": "",\n  "email": "",\n  "phone": "",\n  "location": "",\n  "college": "",\n  "degree": "",\n  "gradYear": "",\n  "education": "",\n  "skills": [],\n  "languages": "",\n  "targetRole": "",\n  "summary": "",\n  "experience": "",\n  "projects": "",\n  "certifications": "",\n  "achievements": "",\n  "linkedin": "",\n  "github": ""\n}\n\nRules:\n- skills must be an array of strings\n- experience, projects, certifications, achievements: preserve full multi-line text as-is\n- education: format as 'College Name\\nDegree (Grad Year)' or leave blank\n- languages: comma-separated list of languages spoken\n- Return ONLY the raw JSON. No markdown code blocks, no explanation, no extra text.\n- If a field is not found, use an empty string or empty array\n\nResume text:\n${rawText.substring(0, 12000)}`;
 
         let parsedData = null;
+        try {
+            const response = await fetch('/api/ai-write', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ field: 'parseResume', context: parsePrompt })
+            });
 
-        // If Python Resume Intelligence Engine extracted structured JSON, map it directly
-        if (serverMeta && serverMeta.resumeJson) {
-            const rj = serverMeta.resumeJson;
-            const p = rj.personal || {};
-            parsedData = {
-                fullName: p.name || '',
-                email: p.email || '',
-                phone: p.phone || '',
-                location: p.location || '',
-                summary: rj.summary || '',
-                skills: rj.skills || [],
-                education: (rj.education || []).map(e => e.details || e).join('\n'),
-                experience: (rj.experience || []).map(e => e.details || e).join('\n'),
-                projects: (rj.projects || []).map(e => e.details || e).join('\n'),
-                certifications: (rj.certifications || []).join('\n'),
-                languages: (rj.languages || []).join(', '),
-                achievements: (rj.achievements || []).join('\n'),
-                linkedin: p.linkedin || '',
-                github: p.github || ''
-            };
-        } else {
-            // AI Fallback parsing
-            const parsePrompt = `You are an expert resume parser. Extract ALL structured information from the following raw resume text and return it as a JSON object with these exact keys:\n{\n  "fullName": "",\n  "email": "",\n  "phone": "",\n  "location": "",\n  "college": "",\n  "degree": "",\n  "gra": "",\n  "education": "",\n  "skills": [],\n  "languages": "",\n  "targetRole": "",\n  "summary": "",\n  "experience": "",\n  "projects": "",\n  "certifications": "",\n  "achievements": "",\n  "linkedin": "",\n  "github": ""\n}\n\nRules:\n- skills must be an array of strings\n- experience, projects, certifications, achievements: preserve full multi-line text as-is\n- education: format as 'College Name\\nDegree (Grad Year)' or leave blank\n- languages: comma-separated list of languages spoken\n- Return ONLY the raw JSON. No markdown code blocks, no explanation, no extra text.\n- If a field is not found, use an empty string or empty array\n\nResume text:\n${rawText.substring(0, 12000)}`;
-
-            try {
-                const response = await fetch('/api/ai-write', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ field: 'parseResume', context: parsePrompt })
-                });
-
-                if (response.ok) {
-                    const resData = await response.json();
-                    const jsonStr = resData.content
-                        .replace(/```json/gi, '')
-                        .replace(/```/g, '')
-                        .trim();
-                    try {
-                        parsedData = JSON.parse(jsonStr);
-                    } catch (parseErr) {
-                        console.warn('JSON parse failed, using raw text fallback');
-                    }
+            if (response.ok) {
+                const resData = await response.json();
+                const jsonStr = resData.content
+                    .replace(/```json/gi, '')
+                    .replace(/```/g, '')
+                    .trim();
+                try {
+                    parsedData = JSON.parse(jsonStr);
+                } catch (parseErr) {
+                    console.warn('JSON parse failed, using raw text fallback');
                 }
-            } catch (aiErr) {
-                console.warn('AI parsing failed, proceeding with raw text');
             }
+        } catch (aiErr) {
+            console.warn('AI parsing failed, proceeding with raw text');
         }
 
-        statusTitle.textContent = 'Pre-filling your profile...';
-        statusDesc.textContent = 'Transferring validated data to builder';
+        statusTitle.textContent = 'Setting up your profile...';
+        statusDesc.textContent = 'Pre-filling forms with extracted data';
 
         state.flow = 'upload';
 
-        // Pre-fill form fields if parsed data is available
+        // Pre-fill form fields if AI parsed data
         if (parsedData) {
-            const fieldMap = {
-                fullName: 'fullName',
-                email: 'email',
-                phone: 'phone',
-                location: 'location',
-                college: 'college',
-                degree: 'degree',
-                undergradGpa: 'undergradGpa',
-                gradYear: 'gradYear',
-                targetRole: 'targetRole',
-                summary: 'summary',
-                linkedin: 'linkedin',
-                github: 'github'
-            };
-
-            Object.entries(fieldMap).forEach(([dataKey, inputId]) => {
-                const el = document.getElementById(inputId);
-                if (el && parsedData[dataKey]) el.value = parsedData[dataKey];
+            const fields = ['fullName','email','phone','location','college','degree','gradYear','targetRole','summary','linkedin','github'];
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if (el && parsedData[f]) el.value = parsedData[f];
             });
-
             if (Array.isArray(parsedData.skills) && parsedData.skills.length > 0) {
                 state.formData.skills = [...new Set(parsedData.skills)];
                 renderSkills();
@@ -3350,14 +3012,13 @@ async function handlePDFUpload(file) {
         state.generatedHTML = buildResumeHTML(previewData, state.formData.selectedTemplate);
         if (els.resumeSheet) els.resumeSheet.innerHTML = state.generatedHTML;
 
-        await new Promise(r => setTimeout(r, 400));
-        uploadStatus.style.display = 'none';
+        await new Promise(r => setTimeout(r, 500));
 
         // Navigate to Skill Gap Analyser
         const targetRole = (parsedData && parsedData.targetRole) || '';
         showSkillGapSection(targetRole, 'upload');
 
-        showToast('Resume parsed successfully!  Analyse your skill gaps below.');
+        showToast('Resume parsed successfully! 🎉 Analyse your skill gaps below.');
 
     } catch (err) {
         console.error('PDF Upload error:', err);
@@ -3369,7 +3030,7 @@ async function handlePDFUpload(file) {
         } else {
             pdfDropZone.style.display = 'flex';
         }
-        showToast('Auto-extract failed - please paste your resume text below.');
+        showToast('Auto-extract failed — please paste your resume text below.');
     }
 }
 
@@ -3394,7 +3055,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('statusDesc').textContent = 'Parsing with Groq AI';
 
             // AI parse
-            const parsePrompt = `You are an expert resume parser. Extract structured information from the following raw resume text and return it as a JSON object with these exact keys:\n{\n  "fullName": "",\n  "email": "",\n  "phone": "",\n  "location": "",\n  "college": "",\n  "degree": "",\n  "gra": "",\n  "skills": [],\n  "targetRole": "",\n  "summary": "",\n  "experience": "",\n  "projects": "",\n  "certifications": "",\n  "achievements": "",\n  "linkedin": "",\n  "github": ""\n}\nRules: skills must be an array. Return ONLY raw JSON.\nResume text:\n${text.substring(0, 4000)}`;
+            const parsePrompt = `You are an expert resume parser. Extract structured information from the following raw resume text and return it as a JSON object with these exact keys:\n{\n  "fullName": "",\n  "email": "",\n  "phone": "",\n  "location": "",\n  "college": "",\n  "degree": "",\n  "gradYear": "",\n  "skills": [],\n  "targetRole": "",\n  "summary": "",\n  "experience": "",\n  "projects": "",\n  "certifications": "",\n  "achievements": "",\n  "linkedin": "",\n  "github": ""\n}\nRules: skills must be an array. Return ONLY raw JSON.\nResume text:\n${text.substring(0, 4000)}`;
 
             let parsedData = null;
             try {
@@ -3411,7 +3072,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch(e){}
 
             if (parsedData) {
-                ['fullName','email','phone','location','college','degree','gra','targetRole','summary','linkedin','github'].forEach(f => {
+                ['fullName','email','phone','location','college','degree','gradYear','targetRole','summary','linkedin','github'].forEach(f => {
                     const el = document.getElementById(f);
                     if (el && parsedData[f]) el.value = parsedData[f];
                 });
@@ -3439,7 +3100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (els.resumeSheet) els.resumeSheet.innerHTML = state.generatedHTML;
 
             showSkillGapSection(parsedData?.targetRole || '', 'upload');
-            showToast('Resume loaded! Analyse skill gaps below. ');
+            showToast('Resume loaded! Analyse skill gaps below. 🎯');
         });
     }
 });
@@ -3479,7 +3140,7 @@ function showResumeEnhanceSection() {
     updateEnhZoom();
 
     window.scrollTo({ top: section.offsetTop - 80, behavior: 'smooth' });
-    showToast('Resume loaded! Enhance, review and download your improved resume. ');
+    showToast('Resume loaded! Enhance, review and download your improved resume. ✨');
 }
 
 function applyEnhChanges() {
@@ -3551,8 +3212,42 @@ function initEnhanceSection() {
         showToast('Generating PDF...');
         const { clone, cleanup } = createExportClone(sheet.innerHTML);
         try {
-            const canvas = await captureResumeCanvas(clone, 3);
-            exportCanvasToPDF(canvas, 'enhanced_resume.pdf');
+            const { jsPDF } = window.jspdf;
+            await waitForReadyState(clone);
+            const canvas = await html2canvas(clone, {
+                scale: 3, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false,
+                width: 794, height: 1123, windowWidth: 794, windowHeight: 1123,
+                onclone: (doc) => {
+                    const el = doc.querySelector('.export-clone');
+                    if (el) {
+                        el.style.position = 'static';
+                        el.style.left = '0';
+                        el.style.top = '0';
+                        el.style.width = '794px';
+                        el.style.height = '1123px';
+                        el.style.overflow = 'hidden';
+                    }
+                }
+            });
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pageW = 210;
+            const totalPxH = canvas.height;
+            const pageHeightPx = Math.round(canvas.width * (297 / 210));
+            const totalPages = Math.ceil(totalPxH / pageHeightPx);
+
+            for (let pg = 0; pg < totalPages; pg++) {
+                if (pg > 0) pdf.addPage();
+                const srcY  = pg * pageHeightPx;
+                const srcH  = Math.min(pageHeightPx, totalPxH - srcY);
+                const slice = document.createElement('canvas');
+                slice.width  = canvas.width;
+                slice.height = srcH;
+                slice.getContext('2d').drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+                const sliceData = slice.toDataURL('image/png', 1.0);
+                const sliceH = (srcH / canvas.width) * pageW;
+                pdf.addImage(sliceData, 'PNG', 0, 0, pageW, sliceH);
+            }
+            pdf.save('enhanced_resume.pdf');
         } catch (err) { showToast('PDF generation failed.'); }
         finally { cleanup(); }
     });
@@ -3562,7 +3257,22 @@ function initEnhanceSection() {
         showToast('Generating image...');
         const { clone, cleanup } = createExportClone(sheet.innerHTML);
         try {
-            const canvas = await captureResumeCanvas(clone, 2);
+            await waitForReadyState(clone);
+            const canvas = await html2canvas(clone, {
+                scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false,
+                width: 794, height: 1123, windowWidth: 794, windowHeight: 1123,
+                onclone: (doc) => {
+                    const el = doc.querySelector('.export-clone');
+                    if (el) {
+                        el.style.position = 'static';
+                        el.style.left = '0';
+                        el.style.top = '0';
+                        el.style.width = '794px';
+                        el.style.height = '1123px';
+                        el.style.overflow = 'hidden';
+                    }
+                }
+            });
             const link = document.createElement('a');
             link.download = 'enhanced_resume.jpg';
             link.href = canvas.toDataURL('image/jpeg', 0.95);
@@ -3643,7 +3353,7 @@ async function enhanceFullResumeFor(target) {
                 state.generatedHTML = buildResumeHTML(parseResumeText(enhanced), state.formData.selectedTemplate || 'modern');
                 sheet.innerHTML = state.generatedHTML;
             }
-            showToast('Resume enhanced successfully with AI! ');
+            showToast('Resume enhanced successfully with AI! ✨');
         } else {
             throw new Error('API error');
         }
@@ -3715,7 +3425,7 @@ async function enhanceSectionFor(sectionKey, btn, target) {
             const newText = replaced ? newLines.join('\n') : currentText + '\n\n' + enhanced;
             textarea.value = newText;
             state.resumeText = newText;
-            showToast(`${sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1)} section enhanced!`);
+            showToast(`${sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1)} section enhanced! ✨`);
         }
     } catch (err) {
         showToast('Enhancement failed. Please try again.');
@@ -3724,853 +3434,3 @@ async function enhanceSectionFor(sectionKey, btn, target) {
         btn.innerHTML = origHTML;
     }
 }
-
-// ============================================
-// AI CONTENT OPTIMIZATION ENGINE
-// ============================================
-
-// ============================================
-// INTELLIGENT LAYOUT-AWARE ENGINE & PIPELINE
-// ============================================
-
-function calculateLayoutFit(container) {
-    if (!container) return null;
-    const scrollHeight = container.scrollHeight;
-    const clientHeight = container.clientHeight || 1123; // Usually 1123px for A4
-    return scrollHeight - clientHeight;
-}
-
-/**
- * 1. INTELLIGENT COLUMN BALANCING
- * Rebalances left/right columns by moving flexible sections when imbalance exceeds 60px.
- */
-function balanceResumeColumns(container) {
-    if (!container) return;
-    
-    // Select column pairs across template styles
-    const leftCol = container.querySelector('[class*="-left"], [class*="-sidebar"], .col-left');
-    const rightCol = container.querySelector('[class*="-right"], [class*="-main"], .col-right');
-
-    if (!leftCol || !rightCol) return;
-
-    const movableTitleKeywords = ['skill', 'certification', 'language', 'achievement', 'interest', 'volunteer', 'award', 'program'];
-
-    let leftH = leftCol.offsetHeight;
-    let rightH = rightCol.offsetHeight;
-    let diff = leftH - rightH;
-
-    // Flexible sections moving loop
-    const maxPasses = 3;
-    let pass = 0;
-
-    while (Math.abs(diff) > 60 && pass < maxPasses) {
-        pass++;
-        const sourceCol = diff > 0 ? leftCol : rightCol;
-        const targetCol = diff > 0 ? rightCol : leftCol;
-
-        // Find all direct section children in source column
-        const sections = Array.from(sourceCol.children);
-        let movedSection = null;
-
-        for (let i = sections.length - 1; i >= 0; i--) {
-            const sec = sections[i];
-            const titleEl = sec.querySelector('[class*="-title"], h3, h4');
-            const titleText = titleEl ? titleEl.textContent.toLowerCase() : '';
-
-            // Check if section is flexible (not Experience, Education, Summary, Header)
-            const isFlexible = movableTitleKeywords.some(kw => titleText.includes(kw));
-
-            if (isFlexible) {
-                movedSection = sec;
-                break;
-            }
-        }
-
-        if (movedSection) {
-            targetCol.appendChild(movedSection);
-            leftH = leftCol.offsetHeight;
-            rightH = rightCol.offsetHeight;
-            diff = leftH - rightH;
-        } else {
-            break; // No more flexible sections to move
-        }
-    }
-}
-
-/**
- * 2. VERTICAL SPACE & DYNAMIC TYPOGRAPHY OPTIMIZATION
- * Scales CSS variables (--section-gap, --font-scale, --line-height) to prevent overflow or eliminate blank gaps.
- */
-function optimizeVerticalSpacingAndTypography(container) {
-    if (!container) return;
-    
-    // First run column balance
-    balanceResumeColumns(container);
-
-    let overflowPx = calculateLayoutFit(container) || 0;
-
-    // Default CSS variable levels
-    let fontScale = 1.0;
-    let sectionGap = 24;
-    let itemGap = 12;
-    let lineHeight = 1.5;
-
-    // Case A: Content Overflow -> Gradually compress spacing & font size
-    if (overflowPx > 15) {
-        if (overflowPx > 150) {
-            fontScale = 0.88;
-            sectionGap = 12;
-            itemGap = 6;
-            lineHeight = 1.35;
-        } else if (overflowPx > 80) {
-            fontScale = 0.92;
-            sectionGap = 16;
-            itemGap = 8;
-            lineHeight = 1.4;
-        } else {
-            fontScale = 0.96;
-            sectionGap = 20;
-            itemGap = 10;
-            lineHeight = 1.45;
-        }
-    } 
-    // Case B: Insufficient Content -> Expand spacing to fill page comfortably
-    else if (overflowPx < -120) {
-        fontScale = 1.04;
-        sectionGap = 28;
-        itemGap = 14;
-        lineHeight = 1.6;
-    }
-
-    // Apply inline style adjustments to container
-    container.style.setProperty('--font-scale', fontScale);
-    container.style.setProperty('--section-gap', `${sectionGap}px`);
-    container.style.setProperty('--item-gap', `${itemGap}px`);
-    container.style.setProperty('--line-height', lineHeight);
-
-    // Re-verify fit
-    return calculateLayoutFit(container);
-}
-
-/**
- * 3. AUTOMATIC QUALITY VALIDATION BEFORE EXPORT
- */
-function validateResumeLayout(container) {
-    if (!container) return { valid: false, errors: ['No container found'] };
-
-    const errors = [];
-    const scrollH = container.scrollHeight;
-    const clientH = container.clientHeight || 1123;
-    const overflow = scrollH - clientH;
-
-    // Check 1: Overflow
-    if (overflow > 20) {
-        errors.push(`Resume content overflows by ${overflow}px.`);
-    }
-
-    // Check 2: Oversized Empty Space (>18% unused page area)
-    const unusedPct = ((clientH - scrollH) / clientH) * 100;
-    if (unusedPct > 18) {
-        errors.push(`Resume has ${Math.round(unusedPct)}% unused empty space on page.`);
-    }
-
-    // Check 3: Column Imbalance
-    const leftCol = container.querySelector('[class*="-left"], [class*="-sidebar"], .col-left');
-    const rightCol = container.querySelector('[class*="-right"], [class*="-main"], .col-right');
-    if (leftCol && rightCol) {
-        const diff = Math.abs(leftCol.offsetHeight - rightCol.offsetHeight);
-        if (diff > 100) {
-            errors.push(`Columns are visually imbalanced by ${diff}px.`);
-        }
-    }
-
-    // Check 4: Orphan Headings (section title at very bottom of container without content)
-    const titles = container.querySelectorAll('[class*="-section-title"], [class*="-title"]');
-    titles.forEach(title => {
-        const parentSec = title.closest('.section, [class*="-section"]') || title.parentElement;
-        if (parentSec && parentSec.offsetHeight < 25) {
-            errors.push(`Orphan heading detected: "${title.textContent.trim()}".`);
-        }
-    });
-
-    return {
-        valid: errors.length === 0,
-        errors,
-        metrics: { overflow, unusedPct: Math.max(0, unusedPct) }
-    };
-}
-
-function showOptimizationModal(originalText, optimizedText, textareaEl, target) {
-    const modal = document.getElementById('optimizationModalOverlay');
-    const origArea = document.getElementById('optOriginalText');
-    const optArea = document.getElementById('optOptimizedText');
-    const btnAccept = document.getElementById('btnAcceptOpt');
-    const btnReject = document.getElementById('btnRejectOpt');
-    const closeBtn = document.getElementById('closeOptModal');
-
-    if (!modal) return;
-
-    origArea.value = originalText;
-    optArea.value = optimizedText;
-    
-    // Reset listeners to avoid multiple bindings
-    const newAccept = btnAccept.cloneNode(true);
-    btnAccept.parentNode.replaceChild(newAccept, btnAccept);
-    const newReject = btnReject.cloneNode(true);
-    btnReject.parentNode.replaceChild(newReject, btnReject);
-    const newClose = closeBtn.cloneNode(true);
-    closeBtn.parentNode.replaceChild(newClose, closeBtn);
-
-    const closeModal = () => modal.classList.add('hidden');
-
-    newAccept.addEventListener('click', () => {
-        textareaEl.value = optimizedText;
-        state.resumeText = optimizedText;
-        if (target === 'enh') {
-            document.getElementById('enhApplyChanges').click();
-        } else {
-            document.getElementById('applyChanges').click();
-        }
-        closeModal();
-        showToast('Optimizations applied successfully!');
-    });
-
-    newReject.addEventListener('click', closeModal);
-    newClose.addEventListener('click', closeModal);
-
-    modal.onclick = (e) => {
-        if (e.target === modal) closeModal();
-    };
-
-    const handleEsc = (e) => {
-        if (e.key === 'Escape') {
-            closeModal();
-            document.removeEventListener('keydown', handleEsc);
-        }
-    };
-    document.addEventListener('keydown', handleEsc);
-
-    modal.classList.remove('hidden');
-}
-
-/**
- * CONSTRAINT-BASED AI LAYOUT OPTIMIZATION ENGINE
- * 
- * Implements a formal 10-Sta// ============================================
-// TEMPLATE GROWTH ZONES & SPACING PRIORITIES
-// ============================================
-const TEMPLATE_GROWTH_ZONES = {
-    creative: {
-        preferred_growth_sections: ['summary', 'skills', 'certifications', 'achievements', 'languages'],
-        spacing_priority: ['between_sections', 'skill_chips', 'line_height'],
-        never_expand: ['contact', 'photo']
-    },
-    minimalPro: {
-        preferred_growth_sections: ['summary', 'skills', 'certifications', 'achievements', 'languages'],
-        spacing_priority: ['between_sections', 'skill_chips', 'line_height'],
-        never_expand: ['contact', 'photo']
-    },
-    boldBlue: {
-        preferred_growth_sections: ['summary', 'skills', 'certifications', 'achievements', 'languages'],
-        spacing_priority: ['between_sections', 'skill_chips', 'line_height'],
-        never_expand: ['contact', 'photo']
-    },
-    campusClub: {
-        preferred_growth_sections: ['motivation', 'skills', 'campusInvolvement', 'achievements', 'languages'],
-        spacing_priority: ['between_sections', 'skill_chips', 'line_height'],
-        never_expand: ['contact', 'photo']
-    },
-    classic: {
-        preferred_growth_sections: ['summary', 'projects', 'experience', 'education', 'achievements'],
-        spacing_priority: ['between_sections', 'line_height', 'item_gap'],
-        never_expand: ['contact']
-    },
-    starter: {
-        preferred_growth_sections: ['summary', 'projects', 'skills', 'education', 'achievements'],
-        spacing_priority: ['between_sections', 'line_height', 'item_gap'],
-        never_expand: ['contact']
-    },
-    technical: {
-        preferred_growth_sections: ['summary', 'projects', 'experience', 'skills', 'certifications'],
-        spacing_priority: ['between_sections', 'line_height', 'item_gap'],
-        never_expand: ['contact']
-    },
-    default: {
-        preferred_growth_sections: ['summary', 'projects', 'experience', 'skills', 'certifications', 'achievements', 'languages'],
-        spacing_priority: ['between_sections', 'skill_chips', 'line_height'],
-        never_expand: ['contact', 'photo']
-    }
-};
-
-/**
- * LAYOUT INTELLIGENCE ENGINE & CONSTRAINT SOLVER
- * 
- * Implements a formal 10-Stage Iterative Optimization Pipeline:
- * Stage 1: Layout Analyzer & Growth Zone Inspection
- * Stage 2: Empty Space & Column Imbalance Measurement (Real DOM)
- * Stage 3: Content Density Analyzer
- * Stage 4: Section Capacity Analyzer
- * Stage 5: Strategy Selector (Sidebar Fill, Main Fill, Page Fill, Compact, Balanced)
- * Stage 6: Intelligent Section Redistribution Planner
- * Stage 7: Layout Metadata-Driven AI Content Optimizer
- * Stage 8: Typography & Spacing Optimizer
- * Stage 9: Pagination & Layout Integrity Optimizer
- * Stage 10: Visual Quality Scorer & Real-time Report Renderer
- */
-const ConstraintLayoutEngine = {
-    // Stage 1 — Layout Analyzer
-    analyzeLayoutConstraints(templateId, element) {
-        const isTwoCol = ['creative','minimalPro','elegantBeige','diagonal','boldBlue','campusClub','campusAchiever','doublePanel'].includes(templateId);
-        const growthZone = TEMPLATE_GROWTH_ZONES[templateId] || TEMPLATE_GROWTH_ZONES.default;
-
-        return {
-            templateId,
-            isTwoCol,
-            pageWidthPx: 794,
-            pageHeightPx: 1123,
-            maxUsableHeightPx: 1060,
-            targetFillMin: 0.88,
-            targetFillMax: 0.95,
-            targetFillIdeal: 0.92,
-            targetColumnDeltaMaxPx: 35,
-            growthZone
-        };
-    },
-
-    // Stage 2 — Empty Space Analyzer (Real DOM Measurements)
-    analyzeEmptySpace(containerEl, layoutConstraints) {
-        if (!containerEl) return { leftPx: 0, rightPx: 0, totalPx: 0, deltaPx: 0, remainingSpacePx: 0, fillRatio: 0, overflowPx: 0, isTwoCol: false, sidebarFillPct: 0, mainFillPct: 0, totalPageUtilizationPct: 0 };
-
-        const isTwoCol = layoutConstraints.isTwoCol;
-        let leftPx = 0;
-        let rightPx = 0;
-        let totalPx = 0;
-
-        if (isTwoCol) {
-            const leftEl = containerEl.querySelector('[class$="-sidebar"], .dp-left');
-            const rightEl = containerEl.querySelector('[class$="-main"], [class$="-right-content"], .dp-right');
-
-            if (leftEl) leftPx = Math.round(leftEl.getBoundingClientRect().height || leftEl.offsetHeight || 0);
-            if (rightEl) rightPx = Math.round(rightEl.getBoundingClientRect().height || rightEl.offsetHeight || 0);
-            totalPx = Math.max(leftPx, rightPx);
-        } else {
-            totalPx = Math.round(containerEl.scrollHeight || containerEl.getBoundingClientRect().height || 0);
-            leftPx = totalPx;
-            rightPx = totalPx;
-        }
-
-        const maxUsable = layoutConstraints.maxUsableHeightPx;
-        const deltaPx = isTwoCol ? Math.abs(leftPx - rightPx) : 0;
-        const remainingSpacePx = Math.max(0, maxUsable - totalPx);
-        const overflowPx = Math.max(0, totalPx - maxUsable);
-        const fillRatio = Math.min(1.25, totalPx / maxUsable);
-
-        const sidebarFillPct = Math.min(100, Math.round((leftPx / maxUsable) * 100));
-        const mainFillPct = Math.min(100, Math.round((rightPx / maxUsable) * 100));
-        const totalPageUtilizationPct = Math.min(100, Math.round((totalPx / maxUsable) * 100));
-
-        return {
-            leftPx,
-            rightPx,
-            totalPx,
-            deltaPx,
-            remainingSpacePx,
-            overflowPx,
-            fillRatio,
-            isTwoCol,
-            sidebarFillPct,
-            mainFillPct,
-            totalPageUtilizationPct
-        };
-    },
-
-    // Stage 3 — Content Density Analyzer
-    analyzeContentDensity(containerEl) {
-        const sections = [];
-        if (!containerEl) return sections;
-
-        const secNodes = containerEl.querySelectorAll('[class*="-section"], .mc-row, .dp-lsection, .dp-rsection');
-        secNodes.forEach(node => {
-            const titleEl = node.querySelector('[class*="-title"], [class*="-header"], .mc-title-col, .dp-pill-label');
-            const contentEl = node.querySelector('[class*="-content"], .mc-content-col, .dp-lcontent, .dp-rcontent');
-
-            const titleText = titleEl ? titleEl.textContent.trim() : '';
-            const contentText = contentEl ? contentEl.textContent.trim() : node.textContent.trim();
-            const rect = node.getBoundingClientRect();
-
-            let key = titleText.toLowerCase().replace(/[^a-z]/g, '');
-            if (key.includes('summary') || key.includes('about')) key = 'summary';
-            else if (key.includes('project')) key = 'projects';
-            else if (key.includes('experience') || key.includes('work')) key = 'experience';
-            else if (key.includes('education')) key = 'education';
-            else if (key.includes('skill')) key = 'skills';
-            else if (key.includes('certif')) key = 'certifications';
-            else if (key.includes('achiev')) key = 'achievements';
-            else if (key.includes('language')) key = 'languages';
-            else if (key.includes('motivation') || key.includes('why')) key = 'motivation';
-            else if (key.includes('involve') || key.includes('campus')) key = 'campusInvolvement';
-
-            sections.push({
-                key,
-                title: titleText,
-                heightPx: Math.round(rect.height || node.offsetHeight || 0),
-                textLength: contentText.length,
-                wordCount: contentText.split(/\s+/).filter(Boolean).length,
-                node
-            });
-        });
-
-        return sections;
-    },
-
-    // Stage 4 — Section Capacity Analyzer
-    analyzeSectionCapacities(resumeData, densitySections) {
-        const capacities = {
-            summary:        { minPx: 50,  idealPx: 120, maxPx: 220, minWords: 20, maxWords: 90 },
-            experience:     { minPx: 160, idealPx: 350, maxPx: 580, minWords: 40, maxWords: 350 },
-            projects:       { minPx: 160, idealPx: 350, maxPx: 580, minWords: 40, maxWords: 350 },
-            education:      { minPx: 70,  idealPx: 140, maxPx: 220, minWords: 15, maxWords: 80 },
-            skills:         { minPx: 50,  idealPx: 100, maxPx: 180, minWords: 10, maxWords: 60 },
-            certifications: { minPx: 40,  idealPx: 90,  maxPx: 160, minWords: 10, maxWords: 50 },
-            achievements:   { minPx: 40,  idealPx: 80,  maxPx: 150, minWords: 10, maxWords: 50 },
-            languages:      { minPx: 30,  idealPx: 60,  maxPx: 110, minWords: 5,  maxWords: 30 },
-            motivation:     { minPx: 60,  idealPx: 120, maxPx: 200, minWords: 25, maxWords: 100 },
-            campusInvolvement: { minPx: 70, idealPx: 150, maxPx: 250, minWords: 25, maxWords: 120 }
-        };
-
-        const sectionStatus = {};
-        densitySections.forEach(s => {
-            const cap = capacities[s.key] || { minPx: 40, idealPx: 100, maxPx: 200, minWords: 10, maxWords: 100 };
-            let state = 'optimal';
-            if (s.heightPx < cap.minPx || s.wordCount < cap.minWords) state = 'under_capacity';
-            else if (s.heightPx > cap.maxPx || s.wordCount > cap.maxWords) state = 'over_capacity';
-
-            sectionStatus[s.key] = {
-                currentPx: s.heightPx,
-                wordCount: s.wordCount,
-                state,
-                capacity: cap
-            };
-        });
-
-        return sectionStatus;
-    },
-
-    // Stage 5 — Strategy Selector & Layout Optimization Plan Generator
-    solveConstraints(emptySpace, sectionCapacities, layoutConstraints, mode = 'balanced') {
-        let fillStrategy = 'BALANCED_MODE';
-
-        if (emptySpace.overflowPx > 5 || mode === 'compact') {
-            fillStrategy = 'COMPACT_MODE';
-        } else if (emptySpace.isTwoCol && emptySpace.leftPx < emptySpace.rightPx - 40) {
-            fillStrategy = 'SIDEBAR_FILL_MODE';
-        } else if (emptySpace.isTwoCol && emptySpace.rightPx < emptySpace.leftPx - 40) {
-            fillStrategy = 'MAIN_FILL_MODE';
-        } else if (!emptySpace.isTwoCol && (emptySpace.fillRatio < layoutConstraints.targetFillMin || mode === 'detailed')) {
-            fillStrategy = 'PAGE_FILL_MODE';
-        } else if (mode === 'detailed') {
-            fillStrategy = emptySpace.isTwoCol ? 'SIDEBAR_FILL_MODE' : 'PAGE_FILL_MODE';
-        }
-
-        const needsAIExpand = ['SIDEBAR_FILL_MODE', 'MAIN_FILL_MODE', 'PAGE_FILL_MODE'].includes(fillStrategy);
-        const needsAICompress = fillStrategy === 'COMPACT_MODE';
-
-        const sectionTargets = {};
-        let targetPxToDistribute = 0;
-
-        if (fillStrategy === 'SIDEBAR_FILL_MODE') {
-            targetPxToDistribute = Math.min(380, Math.max(80, emptySpace.rightPx - emptySpace.leftPx));
-            sectionTargets.summary = Math.round(targetPxToDistribute * 0.30);
-            sectionTargets.skills = Math.round(targetPxToDistribute * 0.15);
-            sectionTargets.certifications = Math.round(targetPxToDistribute * 0.22);
-            sectionTargets.achievements = Math.round(targetPxToDistribute * 0.25);
-            sectionTargets.languages = Math.round(targetPxToDistribute * 0.08);
-        } else if (fillStrategy === 'MAIN_FILL_MODE') {
-            targetPxToDistribute = Math.min(380, Math.max(80, emptySpace.leftPx - emptySpace.rightPx));
-            sectionTargets.projects = Math.round(targetPxToDistribute * 0.45);
-            sectionTargets.experience = Math.round(targetPxToDistribute * 0.35);
-            sectionTargets.summary = Math.round(targetPxToDistribute * 0.20);
-        } else if (fillStrategy === 'PAGE_FILL_MODE') {
-            targetPxToDistribute = Math.min(300, Math.max(60, emptySpace.remainingSpacePx * 0.75));
-            sectionTargets.summary = Math.round(targetPxToDistribute * 0.25);
-            sectionTargets.projects = Math.round(targetPxToDistribute * 0.40);
-            sectionTargets.experience = Math.round(targetPxToDistribute * 0.25);
-            sectionTargets.skills = Math.round(targetPxToDistribute * 0.10);
-        } else if (fillStrategy === 'COMPACT_MODE') {
-            targetPxToDistribute = Math.max(30, emptySpace.overflowPx + 20);
-            sectionTargets.projects = Math.round(targetPxToDistribute * 0.45);
-            sectionTargets.experience = Math.round(targetPxToDistribute * 0.35);
-            sectionTargets.summary = Math.round(targetPxToDistribute * 0.20);
-        }
-
-        const layoutOptimizationPlan = {
-            template: layoutConstraints.templateId,
-            fill_strategy: fillStrategy,
-            page_height_px: layoutConstraints.pageHeightPx,
-            usable_height_px: layoutConstraints.maxUsableHeightPx,
-            sidebar_height_used_px: emptySpace.leftPx,
-            main_height_used_px: emptySpace.rightPx,
-            sidebar_remaining_space_px: Math.max(0, layoutConstraints.maxUsableHeightPx - emptySpace.leftPx),
-            main_remaining_space_px: Math.max(0, layoutConstraints.maxUsableHeightPx - emptySpace.rightPx),
-            column_difference_px: emptySpace.deltaPx,
-            page_utilization_pct: emptySpace.totalPageUtilizationPct,
-            sidebar_fill_pct: emptySpace.sidebarFillPct,
-            main_fill_pct: emptySpace.mainFillPct,
-            optimization_required: fillStrategy !== 'BALANCED_MODE',
-            preferred_growth_sections: layoutConstraints.growthZone.preferred_growth_sections,
-            target_px_distribution: sectionTargets,
-            needsAIExpand,
-            needsAICompress,
-            overflowPx: emptySpace.overflowPx,
-            remainingSpacePx: emptySpace.remainingSpacePx,
-            fillRatio: emptySpace.fillRatio,
-            isTwoCol: emptySpace.isTwoCol
-        };
-
-        return layoutOptimizationPlan;
-    },
-
-    // Stage 6 — Intelligent Section Redistribution Planner
-    planSectionRedistribution(resumeData, containerEl, templateId) {
-        if (!['creative','minimalPro','elegantBeige','diagonal','boldBlue','campusClub','campusAchiever','doublePanel'].includes(templateId)) {
-            return {};
-        }
-
-        const getSecHeight = (key, text) => {
-            if (!text || !text.trim()) return 0;
-            if (containerEl) {
-                const sec = Array.from(containerEl.querySelectorAll('[class*="-section"]')).find(el => {
-                    const t = el.querySelector('[class*="-title"]')?.textContent || '';
-                    return t.toLowerCase().includes(key);
-                });
-                if (sec) return Math.round(sec.getBoundingClientRect().height || 80);
-            }
-            return Math.round((text.length / 45) * 16 + 30);
-        };
-
-        const eduH = (resumeData.college ? 110 : 0) + (resumeData.interSchool ? 50 : 0) + (resumeData.highSchool ? 50 : 0) || 100;
-        const certH = getSecHeight('certif', resumeData.certifications);
-        const achvH = getSecHeight('achiev', resumeData.achievements);
-        const langH = getSecHeight('langua', resumeData.languages);
-        const intH  = getSecHeight('interest', resumeData.additionalInfo);
-
-        const fixedLeftH = 170 + (resumeData.summary ? (resumeData.summary.length / 30) * 16 : 80) + ((resumeData.skills || []).length * 10);
-        const fixedRightH = (resumeData.experience ? (resumeData.experience.length / 65) * 16 : 150) + (resumeData.projects ? (resumeData.projects.length / 65) * 16 : 150);
-
-        const candidates = [
-            { education: 'right', certifications: 'right', achievements: 'left', languages: 'left',  additionalInfo: 'left' },
-            { education: 'right', certifications: 'left',  achievements: 'left', languages: 'left',  additionalInfo: 'left' },
-            { education: 'left',  certifications: 'right', achievements: 'left', languages: 'left',  additionalInfo: 'left' },
-            { education: 'left',  certifications: 'left',  achievements: 'left', languages: 'left',  additionalInfo: 'left' },
-            { education: 'right', certifications: 'right', achievements: 'right',languages: 'left',  additionalInfo: 'left' }
-        ];
-
-        let bestCand = candidates[0];
-        let minDiff = 9999;
-
-        candidates.forEach(cand => {
-            let leftSum = fixedLeftH;
-            let rightSum = fixedRightH;
-
-            if (cand.education === 'left') leftSum += eduH; else rightSum += eduH;
-            if (cand.certifications === 'left') leftSum += certH; else rightSum += certH;
-            if (cand.achievements === 'left') leftSum += achvH; else rightSum += achvH;
-            if (cand.languages === 'left') leftSum += langH; else rightSum += langH;
-            if (cand.additionalInfo === 'left') leftSum += intH; else rightSum += intH;
-
-            const diff = Math.abs(leftSum - rightSum);
-            if (diff < minDiff) {
-                minDiff = diff;
-                bestCand = cand;
-            }
-        });
-
-        gSectionPlacementOverrides = bestCand;
-        return gSectionPlacementOverrides;
-    },
-
-    // Stage 7 — AI Content Optimizer with Structured Metadata
-    async runAIContentOptimization(currentText, layoutPlan, target) {
-        const prompt = `You are an elite Constraint-Based AI Layout Intelligence Engine. Optimize the provided resume text to strictly satisfy layout metadata constraints.
-
-LAYOUT METADATA & CONSTRAINTS:
-${JSON.stringify(layoutPlan, null, 2)}
-
-STRATEGY DIRECTIVES FOR "${layoutPlan.fill_strategy}":
-- IF "SIDEBAR_FILL_MODE": Focus expansion strictly on sidebar sections: Summary/About Me, Skills, Certifications, Achievements, Languages. Expand About Me into a rich 120-170 word profile. Group raw skills into categorized domain groups (e.g. Programming, Web Technologies, Developer Tools, Databases). Format Certifications with issuer & year info. Elaborate single-line achievements into multi-line impact statements. Do NOT inflate main column sections.
-- IF "MAIN_FILL_MODE": Focus expansion on Projects, Work Experience, and Summary.
-- IF "PAGE_FILL_MODE": Proportionally elaborate Summary, Projects, Experience, and Skills across the single column.
-- IF "COMPACT_MODE": Compress text cleanly to cut ${layoutPlan.target_px_distribution.projects || 60}px while preserving 100% of ATS keywords, tools, and technical facts.
-
-STRICT ACCURACY RULES:
-1. NEVER invent false facts, degrees, job titles, companies, dates, skills, or metrics.
-2. Maintain ALL CAPS section headers verbatim. Return ONLY plain text resume.
-
-ORIGINAL RESUME:
-${currentText}`;
-
-        const response = await fetch('/api/ai-write', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ field: 'constraintOptimization', context: prompt })
-        });
-
-        if (!response.ok) throw new Error('AI optimization request failed');
-        const resData = await response.json();
-        return resData.content;
-    },
-
-    // Stage 8 — Typography & Spacing Optimizer
-    optimizeTypographyAndSpacing(containerEl, layoutPlan) {
-        if (!containerEl) return { fontScale: 1, lineHeights: 1.6 };
-
-        let fontScale = 1.0;
-        let lineHeights = 1.6;
-        let sectionGap = 22;
-        let itemGap = 11;
-        let paddingScale = 1.0;
-
-        if (layoutPlan.fill_strategy === 'COMPACT_MODE') {
-            fontScale = 0.86;
-            lineHeights = 1.32;
-            sectionGap = 10;
-            itemGap = 5;
-            paddingScale = 0.78;
-        } else if (layoutPlan.fill_strategy === 'SIDEBAR_FILL_MODE' || layoutPlan.fill_strategy === 'MAIN_FILL_MODE' || layoutPlan.fill_strategy === 'PAGE_FILL_MODE') {
-            fontScale = 1.03;
-            lineHeights = 1.68;
-            sectionGap = 26;
-            itemGap = 14;
-            paddingScale = 1.08;
-        }
-
-        containerEl.style.setProperty('--font-scale', fontScale);
-        containerEl.style.setProperty('--line-height', lineHeights);
-        containerEl.style.setProperty('--section-gap', `${sectionGap}px`);
-        containerEl.style.setProperty('--item-gap', `${itemGap}px`);
-        containerEl.style.setProperty('--padding-scale', paddingScale);
-
-        return { fontScale, lineHeights, sectionGap, itemGap, paddingScale };
-    },
-
-    // Stage 9 — Pagination & Layout Integrity Optimizer
-    optimizePaginationAndIntegrity(containerEl) {
-        if (!containerEl) return;
-
-        const headings = containerEl.querySelectorAll('[class*="-section-title"], .mc-title-col');
-        headings.forEach(h => {
-            const rect = h.getBoundingClientRect();
-            const parentRect = containerEl.getBoundingClientRect();
-            const bottomMargin = parentRect.bottom - rect.bottom;
-            if (bottomMargin > 0 && bottomMargin < 35) {
-                h.style.pageBreakBefore = 'always';
-            }
-        });
-    },
-
-    // Stage 10 — Visual Quality Scorer & Real-Time Report Renderer
-    calculateVisualQualityScore(emptySpace, layoutPlan, typographyState) {
-        let colScore = 25;
-        if (emptySpace.isTwoCol) {
-            colScore = Math.max(0, Math.round(25 * (1 - (emptySpace.deltaPx / 60))));
-        }
-
-        let fillScore = 35;
-        const ratio = emptySpace.fillRatio;
-        if (ratio >= 0.88 && ratio <= 0.95) fillScore = 35;
-        else if (ratio < 0.88) fillScore = Math.max(10, Math.round(35 * (ratio / 0.88)));
-        else fillScore = Math.max(0, Math.round(35 * (1 - (ratio - 0.95) * 4)));
-
-        let overflowScore = emptySpace.overflowPx === 0 ? 25 : Math.max(0, 25 - Math.round(emptySpace.overflowPx / 4));
-        let typoScore = 15;
-
-        const totalScore = Math.min(100, colScore + fillScore + overflowScore + typoScore);
-
-        return {
-            totalScore,
-            colScore,
-            fillScore,
-            overflowScore,
-            typoScore,
-            metrics: emptySpace
-        };
-    },
-
-    renderLayoutIntelligenceReport(layoutPlan, qualityResult, target) {
-        const reportEl = document.getElementById(target === 'enh' ? 'layoutReport_enh' : 'layoutReport_scratch');
-        const badgeEl = document.getElementById(target === 'enh' ? 'optBadge_enh' : 'optBadge_scratch');
-
-        if (!reportEl) return;
-        reportEl.classList.remove('hidden');
-
-        const strategyNames = {
-            'SIDEBAR_FILL_MODE': '⚡ Sidebar Fill Mode',
-            'MAIN_FILL_MODE': '⚡ Main Fill Mode',
-            'PAGE_FILL_MODE': '⚡ Page Fill Mode',
-            'COMPACT_MODE': '✂️ Compact Mode',
-            'BALANCED_MODE': '✨ Balanced Fit'
-        };
-
-        if (badgeEl) {
-            badgeEl.innerHTML = strategyNames[layoutPlan.fill_strategy] || 'Auto-Fit';
-        }
-
-        const planItems = Object.entries(layoutPlan.target_px_distribution || {})
-            .filter(([_, px]) => px > 0)
-            .map(([sec, px]) => `<li>Expand <strong>${sec.toUpperCase()}</strong>: +${px}px</li>`)
-            .join('');
-
-        reportEl.innerHTML = `
-            <div class="lir-header">
-                <span>Layout Intelligence Report</span>
-                <span class="lir-strategy-tag">${strategyNames[layoutPlan.fill_strategy] || layoutPlan.fill_strategy}</span>
-            </div>
-            <div class="lir-grid">
-                <div class="lir-item"><span>Page Utilization:</span> <span class="lir-val">${layoutPlan.page_utilization_pct}%</span></div>
-                <div class="lir-item"><span>Column Delta:</span> <span class="lir-val">${layoutPlan.column_difference_px}px</span></div>
-                <div class="lir-item"><span>Sidebar Fill:</span> <span class="lir-val">${layoutPlan.sidebar_fill_pct}%</span></div>
-                <div class="lir-item"><span>Main Fill:</span> <span class="lir-val">${layoutPlan.main_fill_pct}%</span></div>
-            </div>
-            ${planItems ? `
-                <div class="lir-plan-title">Targeted Optimization Plan:</div>
-                <ul class="lir-plan-list">${planItems}</ul>
-            ` : ''}
-        `;
-    },
-
-    // MASTER ITERATIVE OPTIMIZATION LOOP
-    async runIterativeOptimizationPipeline(target, mode = 'balanced', options = {}) {
-        const sheet = target === 'enh' ? els.enhResumeSheet : els.resumeSheet;
-        const textarea = target === 'enh' ? els.enhEditTextarea : els.editTextarea;
-        const btn = document.getElementById(target === 'enh' ? 'btnOptimizeContent_enh' : 'btnOptimizeContent_scratch');
-        const currentText = textarea.value || state.resumeText;
-
-        if (!currentText || !currentText.trim()) {
-            showToast('No resume content to optimize.');
-            return;
-        }
-
-        const templateId = state.formData.selectedTemplate || 'modern';
-        const origBtnText = btn ? btn.innerHTML : '';
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-brain fa-spin"></i> Analyzing Geometry...'; }
-
-        showToast('Initializing Layout Intelligence Engine...');
-
-        try {
-            let pass = 1;
-            const maxPasses = 3;
-            let finalScore = 0;
-            let currentResumeText = currentText;
-            let layoutPlan = null;
-            let scoreResult = null;
-
-            while (pass <= maxPasses) {
-                // Parse & Render current draft
-                const resumeData = parseResumeText(currentResumeText);
-                state.generatedHTML = buildResumeHTML(resumeData, templateId);
-                sheet.innerHTML = state.generatedHTML;
-                await new Promise(r => setTimeout(r, 40));
-
-                // Stage 1: Layout Constraints & Growth Zones
-                const layoutConstraints = this.analyzeLayoutConstraints(templateId, sheet);
-
-                // Stage 2: Real DOM Empty Space Measurement
-                const emptySpace = this.analyzeEmptySpace(sheet, layoutConstraints);
-
-                // Stage 3: Content Density
-                const densitySections = this.analyzeContentDensity(sheet);
-
-                // Stage 4: Section Capacities
-                const capacities = this.analyzeSectionCapacities(resumeData, densitySections);
-
-                // Stage 5: Strategy Selector & Layout Optimization Plan Generator
-                layoutPlan = this.solveConstraints(emptySpace, capacities, layoutConstraints, mode);
-
-                // Stage 6: Section Redistribution (Pass 1)
-                if (emptySpace.isTwoCol && pass === 1) {
-                    this.planSectionRedistribution(resumeData, sheet, templateId);
-                    state.generatedHTML = buildResumeHTML(resumeData, templateId);
-                    sheet.innerHTML = state.generatedHTML;
-                    await new Promise(r => setTimeout(r, 40));
-                }
-
-                // Stage 8: Typography & Spacing Optimizer
-                const typographyState = this.optimizeTypographyAndSpacing(sheet, layoutPlan);
-
-                // Stage 9: Pagination Integrity
-                this.optimizePaginationAndIntegrity(sheet);
-
-                // Re-measure post spacing adjustment
-                const reMeasuredSpace = this.analyzeEmptySpace(sheet, layoutConstraints);
-
-                // Stage 10: Quality Score & Real-Time Report Rendering
-                scoreResult = this.calculateVisualQualityScore(reMeasuredSpace, layoutPlan, typographyState);
-                finalScore = scoreResult.totalScore;
-                this.renderLayoutIntelligenceReport(layoutPlan, scoreResult, target);
-
-                // Check termination condition
-                if (finalScore >= 90 || (!layoutPlan.needsAIExpand && !layoutPlan.needsAICompress) || pass === maxPasses) {
-                    showToast(`Layout Intelligence Complete! Quality Score: ${finalScore}/100 🎉`);
-                    break;
-                }
-
-                // Stage 7: Layout Metadata-Driven AI Content Optimization (Pass 2)
-                if (pass < maxPasses && (layoutPlan.needsAIExpand || layoutPlan.needsAICompress)) {
-                    if (btn) btn.innerHTML = `<i class="fas fa-wand-magic-sparkles fa-spin"></i> ${layoutPlan.fill_strategy} (Pass ${pass + 1})...`;
-                    showToast(`Pass ${pass}: AI executing ${layoutPlan.fill_strategy}...`);
-                    const aiOptimizedText = await this.runAIContentOptimization(currentResumeText, layoutPlan, target);
-                    if (aiOptimizedText && aiOptimizedText.length > 50) {
-                        currentResumeText = aiOptimizedText;
-                    }
-                }
-
-                pass++;
-            }
-
-            // Sync final state
-            textarea.value = currentResumeText;
-            state.resumeText = currentResumeText;
-            const finalParsed = parseResumeText(currentResumeText);
-            state.generatedHTML = buildResumeHTML(finalParsed, templateId);
-            sheet.innerHTML = state.generatedHTML;
-
-            const printSheet = document.getElementById('resumeSheetPrint');
-            if (printSheet) printSheet.innerHTML = state.generatedHTML;
-
-            showToast(`Layout Optimization Finished! Visual Quality Score: ${finalScore}/100`);
-
-        } catch (err) {
-            console.error('Layout Intelligence Engine error:', err);
-            showToast('Layout Engine notice: Applied baseline column and spacing balance.');
-        } finally {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = origBtnText;
-            }
-        }
-    }
-};
-
-async function runContentOptimization(target, mode) {
-    return ConstraintLayoutEngine.runIterativeOptimizationPipeline(target, mode);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const optBtnScratch = document.getElementById('btnOptimizeContent_scratch');
-    const optModeScratch = document.getElementById('optimizeMode_scratch');
-    if (optBtnScratch && optModeScratch) {
-        optBtnScratch.addEventListener('click', (e) => {
-            e.preventDefault();
-            runContentOptimization('scratch', optModeScratch.value);
-        });
-    }
-
-    const optBtnEnh = document.getElementById('btnOptimizeContent_enh');
-    const optModeEnh = document.getElementById('optimizeMode_enh');
-    if (optBtnEnh && optModeEnh) {
-        optBtnEnh.addEventListener('click', (e) => {
-            e.preventDefault();
-            runContentOptimization('enh', optModeEnh.value);
-        });
-    }
-});

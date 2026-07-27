@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -15,17 +14,13 @@ app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '20mb' }));
 app.use(express.static(path.join(__dirname)));
 
-// Multer — store uploaded PDF in memory (up to 30MB, relaxed PDF mime filter)
+// Multer — store uploaded PDF in memory (no disk write)
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 30 * 1024 * 1024 }, // 30 MB
+    limits: { fileSize: 15 * 1024 * 1024 }, // 15 MB
     fileFilter: (req, file, cb) => {
-        const ext = path.extname(file.originalname || '').toLowerCase();
-        if (ext === '.pdf' || (file.mimetype && (file.mimetype.includes('pdf') || file.mimetype === 'application/octet-stream'))) {
-            cb(null, true);
-        } else {
-            cb(null, true); // Allow upload and let python validation inspect magic bytes
-        }
+        if (file.mimetype === 'application/pdf') cb(null, true);
+        else cb(new Error('Only PDF files are allowed'));
     }
 });
 
@@ -90,10 +85,6 @@ function buildPrompt(data) {
 
     prompt += `\n\nFORMAT: Use plain text with section headers in ALL CAPS followed by a blank line, then the content. Keep it professional, concise, and ATS-friendly. Each section should be 3-8 lines.\n`;
     prompt += `\nIMPORTANT: Only use information provided by the user. Do not add fake companies, fake projects, or fake achievements.\n`;
-    prompt += `\nLENGTH BALANCING (important for layout): This resume will be rendered into a fixed one-page template with two columns, so section length matters as much as content.\n`;
-    prompt += `- If the user gave you a LOT of raw detail for a section, do NOT drop any point, achievement, or credential — instead compress it: shorter sentences, tighter phrasing, merge related points, cut filler words. Every fact the user provided must still appear, just written more concisely.\n`;
-    prompt += `- If the user gave very little detail for a section, expand it slightly using ONLY what they told you — describe the same facts in fuller, more complete sentences (impact, context, tools used) rather than inventing new accomplishments. Do not pad with generic filler that adds no real information.\n`;
-    prompt += `- Aim for each major section (Experience, Projects, Skills, Education, etc.) to be roughly similar in visual weight so no column of the final layout ends up mostly empty while another overflows.\n`;
 
     return prompt;
 }
@@ -240,18 +231,11 @@ app.post('/api/generate-resume', async (req, res) => {
                     resumeText = groqData.choices[0].message.content;
                     aiGenerated = true;
                 } else {
-                    let detail = `HTTP ${groqResponse.status}`;
-                    try {
-                        const errBody = await groqResponse.json();
-                        detail = errBody?.error?.message || detail;
-                    } catch (_) { /* not JSON */ }
-                    console.log('Groq returned error response:', detail);
+                    console.log('Groq returned error response status:', groqResponse.status);
                 }
             } catch (aiError) {
                 console.log('AI generation failed, using fallback:', aiError.message);
             }
-        } else {
-            console.log('GROQ_API_KEY is not set — falling back to local resume generation.');
         }
 
         if (!resumeText) {
@@ -281,7 +265,7 @@ app.post('/api/ai-write', async (req, res) => {
         const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
         if (!GROQ_API_KEY) {
-            return res.status(503).json({ error: 'AI service not configured. Please set GROQ_API_KEY in your .env file.' });
+            return res.status(503).json({ error: 'AI service not configured. Please set GROQ_API_KEY.' });
         }
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -293,190 +277,34 @@ app.post('/api/ai-write', async (req, res) => {
             body: JSON.stringify({
                 model: 'llama-3.3-70b-versatile',
                 messages: [
-                    { 
-                        role: 'system', 
-                        content: `You are an elite AI Content Optimization Engine for a professional, ATS-compatible resume builder.
-
-RULES:
-1. NEVER invent false facts, unheld degrees, non-existent work experience, or fake metrics/companies.
-2. Maintain professional, high-impact language with strong action verbs.
-3. IN EXPAND MODE (Insufficient Content / Empty Spaces):
-   - Expand brief profile summaries (<40 words) into rich 70-90 word career summaries.
-   - Expand single-line project or experience descriptions into 3-5 quantifiable achievement bullet points.
-   - Categorize raw skill lists into clean groups (e.g. Programming Languages, Frameworks & Libraries, Developer Tools, Databases, Professional Skills).
-   - Elaborate existing technical facts naturally without inventing false credentials.
-4. IN COMPRESS MODE (Content Overflow):
-   - Remove redundant words and filler phrases while preserving 100% of factual achievements, metrics, languages, and titles.
-   - Merge repetitive bullet points. Use punchy, concise phrasing.
-5. Always return clean, formatted resume text.` 
-                    },
+                    { role: 'system', content: 'You are a professional resume writer and ATS optimization expert. Write concise, impactful, ATS-friendly content. Use strong action verbs. Be realistic and do not invent fake information.' },
                     { role: 'user', content: context }
                 ],
                 temperature: 0.7,
-                max_tokens: ['fullResume', 'fullEnhance', 'constraintOptimization', 'contentOptimization'].includes(field) ? 3000 : 800
+                max_tokens: field === 'fullResume' || field === 'fullEnhance' ? 3000 : 800
             })
         });
 
-        if (!response.ok) {
-            // Surface the real reason (invalid key, rate limit, deprecated model, etc.)
-            // instead of a generic message, so failures are actually diagnosable.
-            let detail = `Groq API error (HTTP ${response.status})`;
-            try {
-                const errBody = await response.json();
-                detail = errBody?.error?.message || detail;
-            } catch (_) { /* body wasn't JSON, keep generic detail */ }
-            console.error('Groq API request failed:', detail);
-            return res.status(502).json({ error: 'AI generation failed', message: detail });
-        }
+        if (!response.ok) throw new Error('Groq API error');
 
         const data = await response.json();
         res.json({ success: true, content: data.choices[0].message.content.trim() });
 
     } catch (error) {
-        console.error('AI write handler error:', error);
         res.status(500).json({ error: 'AI generation failed', message: error.message });
     }
 });
 
 // ============================================
-// ============================================
-// ROLE SKILLS — AI-backed, for roles not in the
-// client's hardcoded map (e.g. "Video Editor",
-// "Wedding Videographer", any non-tech role).
-// ============================================
-app.post('/api/role-skills', async (req, res) => {
-    try {
-        const { role } = req.body;
-        if (!role || !role.trim()) return res.status(400).json({ error: 'Missing role' });
-
-        const GROQ_API_KEY = process.env.GROQ_API_KEY;
-        if (!GROQ_API_KEY) {
-            return res.status(503).json({ error: 'AI service not configured.' });
-        }
-
-        const prompt = `List the 8-10 most essential, concrete, hireable skills for the job role "${role}". This may be a technical role, a creative role (e.g. video editing, design, photography), or a business/marketing role — infer the correct domain from the role itself and stay strictly within it. Return ONLY a raw JSON array of short skill name strings, nothing else. No explanation, no markdown, no code fences. Example format: ["Skill One", "Skill Two"]`;
-
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${GROQ_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
-                messages: [
-                    { role: 'system', content: 'You output only valid raw JSON arrays of strings. No prose, no markdown fences.' },
-                    { role: 'user', content: prompt }
-                ],
-                temperature: 0.4,
-                max_tokens: 300
-            })
-        });
-
-        if (!response.ok) {
-            return res.status(502).json({ error: 'AI generation failed' });
-        }
-
-        const data = await response.json();
-        let raw = (data.choices?.[0]?.message?.content || '').trim();
-        raw = raw.replace(/^```json\s*|```$/g, '').trim();
-
-        let skills = [];
-        try {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) skills = parsed.filter(s => typeof s === 'string' && s.trim()).slice(0, 10);
-        } catch (_) {
-            // Fallback: pull quoted strings out of a malformed response
-            const matches = raw.match(/"([^"]+)"/g);
-            if (matches) skills = matches.map(m => m.replace(/"/g, '')).slice(0, 10);
-        }
-
-        if (skills.length === 0) return res.status(502).json({ error: 'Could not determine skills for this role' });
-        res.json({ success: true, role, skills });
-
-    } catch (error) {
-        console.error('Role-skills error:', error.message);
-        res.status(500).json({ error: 'Failed to fetch role skills', message: error.message });
-    }
-});
-
-// ============================================
-// AUTO-SPAWN PYTHON MICROSERVICE IF NEEDED
-// ============================================
-const PYTHON_SERVICE_URL = process.env.PYTHON_PARSER_URL || 'http://127.0.0.1:5001';
-
-async function checkOrStartPythonService() {
-    try {
-        const res = await fetch(`${PYTHON_SERVICE_URL}/`, { signal: AbortSignal.timeout(1500) });
-        if (res.ok) {
-            console.log(`[PythonService] Connected to Resume Intelligence Engine at ${PYTHON_SERVICE_URL}`);
-            return;
-        }
-    } catch (e) {
-        if (process.env.DISABLE_PYTHON_SPAWN !== 'true') {
-            console.log(`[PythonService] Starting Python microservice on port 5001...`);
-            const { spawn } = require('child_process');
-            const pyProc = spawn('python', ['parser_service.py'], { stdio: 'inherit' });
-            pyProc.on('error', (err) => console.warn('[PythonService] Could not auto-spawn Python:', err.message));
-        }
-    }
-}
-
-// ============================================
-// PDF EXTRACTION — Resume Intelligence Engine
-// Calls Python microservice (PyMuPDF, pdfplumber, OpenCV OCR, Layout Reconstruction)
+// PDF EXTRACTION — server-side with pdf-parse
 // ============================================
 app.post('/api/extract-pdf', upload.single('pdf'), async (req, res) => {
     try {
-        if (!req.file || !req.file.buffer) {
-            return res.status(400).json({ error: 'No PDF file uploaded.' });
-        }
-
-        // 1. Try calling the Python Resume Intelligence Engine
-        try {
-            const formData = new FormData();
-            const blob = new Blob([req.file.buffer], { type: req.file.mimetype || 'application/pdf' });
-            formData.append('file', blob, req.file.originalname || 'resume.pdf');
-
-            const pyResponse = await fetch(`${PYTHON_SERVICE_URL}/parse-pdf`, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (pyResponse.ok) {
-                const pyData = await pyResponse.json();
-                console.log(`[ResumeParser] Parsed successfully via ${pyData.parser_used} (Confidence: ${pyData.confidence_score}%)`);
-                return res.json({
-                    success: true,
-                    text: pyData.raw_extracted_text,
-                    pages: pyData.page_count,
-                    parserUsed: pyData.parser_used,
-                    documentType: pyData.document_type,
-                    confidenceScore: pyData.confidence_score,
-                    fieldConfidence: pyData.field_confidence,
-                    resumeJson: pyData.resume_json
-                });
-            }
-        } catch (pyErr) {
-            console.warn('[ResumeParser] Python service notice:', pyErr.message);
-        }
-
-        // 2. Fallback to node pdf-parse
-        const parseFn = typeof pdfParse === 'function' ? pdfParse : (pdfParse.default || pdfParse.pdfParse);
-        const data = await parseFn(req.file.buffer);
+        if (!req.file) return res.status(400).json({ error: 'No PDF file received.' });
+        const data = await pdfParse(req.file.buffer);
         const text = data.text || '';
-
         if (!text.trim()) return res.status(422).json({ error: 'PDF has no extractable text (may be image-based or scanned).' });
-
-        res.json({
-            success: true,
-            text: text.trim(),
-            pages: data.numpages,
-            parserUsed: 'pdf-parse (Fallback)',
-            documentType: 'DIGITAL',
-            confidenceScore: 85,
-            fieldConfidence: { name: 90, email: 95, phone: 90, education: 85, experience: 85, skills: 88 }
-        });
+        res.json({ success: true, text: text.trim(), pages: data.numpages });
     } catch (err) {
         console.error('PDF extract error:', err.message);
         res.status(500).json({ error: 'Failed to extract PDF text.', message: err.message });
@@ -490,7 +318,6 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`\n🚀 AI Resume Builder v2.0 running on http://localhost:${PORT}`);
     console.log(`📄 Open http://localhost:${PORT} in your browser\n`);
-    checkOrStartPythonService();
 });
 
 module.exports = app;
