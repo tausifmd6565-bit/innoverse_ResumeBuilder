@@ -23,31 +23,32 @@
     ═══════════════════════════════════════ -->
     <nav class="navbar" id="navbar">
         <div class="nav-brand">
-            <div class="nav-logo"><i class="fas fa-file-signature"></i></div>
-            <span class="nav-title">AI Resume Builder</span>
-        </div>
-        <div class="nav-center-links">
-            <a href="#hero" class="nav-link">Home</a>
-            <a href="#builder" class="nav-link">Builder</a>
-            <a href="#how-it-works" class="nav-link">How It Works</a>
-        </div>
-        <div class="nav-right">
+            <div class="nav-logo" title="Innoverse AI Resume Builder"><i class="fas fa-file-signature"></i></div>
             <div class="nav-badge-wrap">
                 <span class="nav-badge-innoverse">Innoverse</span>
                 <span class="nav-badge-amu">AMU</span>
             </div>
-            <a href="#builder" class="btn btn-nav">
+        </div>
+        <div class="nav-center-links">
+            <a href="#hero" class="nav-link">Home</a>
+            <a href="#builder" class="nav-link">Builder</a>
+            <a href="javascript:void(0)" class="nav-link" id="navSkillGapBtn">Skill Gap Analyser</a>
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+        </div>
+        <div class="nav-right">
+            <a href="#builder" class="btn btn-nav btn-nav-desktop">
                 <i class="fas fa-magic"></i> Build Resume
             </a>
-            <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Mobile Menu"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
-    <!-- Mobile Menu -->
+    <!-- Mobile Menu Drawer (3-Dash Menu) -->
     <div class="mobile-menu" id="mobileMenu">
-        <a href="#hero" class="mobile-link"><i class="fas fa-home"></i> Home</a>
-        <a href="#how-it-works" class="mobile-link"><i class="fas fa-list-ol"></i> How It Works</a>
-        <a href="#builder" class="mobile-link"><i class="fas fa-magic"></i> Build Resume</a>
+        <a href="#hero" class="mobile-link" id="mlHome"><i class="fas fa-home"></i> Home</a>
+        <a href="#builder" class="mobile-link" id="mlBuilder"><i class="fas fa-magic"></i> Resume Builder</a>
+        <a href="javascript:void(0)" class="mobile-link" id="mlSkillGap"><i class="fas fa-bullseye"></i> Skill Gap Analyser</a>
+        <a href="#how-it-works" class="mobile-link" id="mlHowItWorks"><i class="fas fa-list-ol"></i> How It Works</a>
     </div>
 
     <!-- ═══════════════════════════════════════
