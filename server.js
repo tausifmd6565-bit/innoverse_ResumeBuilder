@@ -296,15 +296,59 @@ app.post('/api/ai-write', async (req, res) => {
 });
 
 // ============================================
-// PDF EXTRACTION — server-side with pdf-parse
+// PDF EXTRACTION — 11-Stage Python Engine with pdf-parse Fallback
 // ============================================
 app.post('/api/extract-pdf', upload.single('pdf'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'No PDF file received.' });
-        const data = await pdfParse(req.file.buffer);
-        const text = data.text || '';
-        if (!text.trim()) return res.status(422).json({ error: 'PDF has no extractable text (may be image-based or scanned).' });
-        res.json({ success: true, text: text.trim(), pages: data.numpages });
+
+        const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || 'http://127.0.0.1:5001';
+
+        // ── Strategy 1: Forward to Python 11-Stage Resume Intelligence Engine ──
+        try {
+            const formData = new FormData();
+            const pdfBlob = new Blob([req.file.buffer], { type: req.file.mimetype || 'application/pdf' });
+            formData.append('file', pdfBlob, req.file.originalname || 'resume.pdf');
+
+            const pythonResp = await fetch(`${PYTHON_SERVICE_URL}/parse-pdf`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (pythonResp.ok) {
+                const pyData = await pythonResp.json();
+                if (pyData.status === 'success' && pyData.raw_extracted_text && pyData.raw_extracted_text.trim().length > 30) {
+                    console.log(`[ResumeParser] Parsed successfully via ${pyData.parser_used} (Confidence: ${pyData.confidence_score}%)`);
+                    return res.json({
+                        success: true,
+                        text: pyData.raw_extracted_text.trim(),
+                        resume_json: pyData.resume_json,
+                        parser: pyData.parser_used,
+                        confidence: pyData.confidence_score,
+                        pages: pyData.page_count
+                    });
+                }
+            }
+        } catch (pyErr) {
+            console.warn('[ResumeParser] Python microservice parse attempt failed, falling back to pdf-parse:', pyErr.message);
+        }
+
+        // ── Strategy 2: Fallback to Node pdf-parse ──
+        let text = '';
+        let numpages = 1;
+        try {
+            const parseFn = typeof pdfParse === 'function' ? pdfParse : (pdfParse && pdfParse.default) || (pdfParse && pdfParse.pdfParse);
+            if (parseFn) {
+                const data = await parseFn(req.file.buffer);
+                text = data.text || '';
+                numpages = data.numpages || 1;
+            }
+        } catch (pdfErr) {
+            console.warn('[ResumeParser] Node pdf-parse fallback error:', pdfErr.message);
+        }
+
+        if (!text.trim()) return res.status(422).json({ error: 'PDF has no extractable text (may be password-protected or image-only).' });
+        res.json({ success: true, text: text.trim(), pages: numpages, parser: 'pdf-parse (Fallback)' });
     } catch (err) {
         console.error('PDF extract error:', err.message);
         res.status(500).json({ error: 'Failed to extract PDF text.', message: err.message });

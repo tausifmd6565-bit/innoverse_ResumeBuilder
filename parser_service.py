@@ -140,21 +140,29 @@ def detect_pdf_type(doc: fitz.Document) -> Dict[str, Any]:
 
 
 # ==============================================================================
-# STAGE 3 — PRIMARY PARSER (PyMuPDF with Line-Break & Font Extraction)
+# STAGE 3 — PRIMARY PARSER (PyMuPDF with Color/Vector & Line-Break Extraction)
 # ==============================================================================
 def extract_blocks_pymupdf(doc: fitz.Document) -> List[Dict[str, Any]]:
     blocks_data = []
+    # Flags to extract text from clip-paths, vector drawing containers, and colored layers
+    extract_flags = fitz.TEXT_DEHYPHENATE | fitz.TEXT_PRESERVE_WHITESPACE | fitz.TEXT_PRESERVE_LIGATURES | fitz.TEXT_MEDIABOX_CLIP
 
     for page_idx, page in enumerate(doc):
         page_rect = page.rect
         page_width = page_rect.width
         page_height = page_rect.height
 
-        page_blocks = page.get_text("dict")["blocks"]
+        try:
+            page_dict = page.get_text("dict", flags=extract_flags)
+            page_blocks = page_dict.get("blocks", [])
+        except Exception:
+            page_blocks = []
+
+        page_char_count = 0
+
         for b_idx, block in enumerate(page_blocks):
             if block.get("type") == 0:  # Text block
                 lines = block.get("lines", [])
-
                 for line in lines:
                     line_text = ""
                     font_name = "Helvetica"
@@ -174,9 +182,10 @@ def extract_blocks_pymupdf(doc: fitz.Document) -> List[Dict[str, Any]]:
 
                     clean_line = sanitize_text(line_text)
                     if clean_line:
+                        page_char_count += len(clean_line)
                         blocks_data.append({
                             "page": page_idx + 1,
-                            "block_id": b_idx,
+                            "block_id": len(blocks_data),
                             "text": clean_line,
                             "x0": round(line_bbox[0], 2),
                             "y0": round(line_bbox[1], 2),
@@ -187,6 +196,30 @@ def extract_blocks_pymupdf(doc: fitz.Document) -> List[Dict[str, Any]]:
                             "font_name": font_name,
                             "font_size": round(font_size, 2),
                             "is_bold": is_bold,
+                            "page_width": round(page_width, 2),
+                            "page_height": round(page_height, 2)
+                        })
+
+        # Fallback for colored/Canva PDFs: if get_text("dict") yields < 50 chars, extract page text directly
+        if page_char_count < 50:
+            direct_text = page.get_text("text", flags=extract_flags)
+            if direct_text and len(direct_text.strip()) > 30:
+                for l_idx, raw_l in enumerate(direct_text.splitlines()):
+                    clean_l = sanitize_text(raw_l)
+                    if clean_l:
+                        blocks_data.append({
+                            "page": page_idx + 1,
+                            "block_id": len(blocks_data),
+                            "text": clean_l,
+                            "x0": 40.0,
+                            "y0": round(40.0 + l_idx * 16, 2),
+                            "x1": round(page_width * 0.8, 2),
+                            "y1": round(40.0 + l_idx * 16 + 12, 2),
+                            "width": round(page_width * 0.7, 2),
+                            "height": 12.0,
+                            "font_name": "DirectText",
+                            "font_size": 10.0,
+                            "is_bold": False,
                             "page_width": round(page_width, 2),
                             "page_height": round(page_height, 2)
                         })
@@ -233,42 +266,66 @@ def extract_blocks_pdfplumber(file_bytes: bytes) -> List[Dict[str, Any]]:
     try:
         with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
             for page_idx, page in enumerate(pdf.pages):
-                words = page.extract_words(keep_blank_chars=True, extra_attrs=["fontname", "size"])
-                lines_dict = {}
-                for w in words:
-                    top_key = round(w["top"] / 4) * 4
-                    if top_key not in lines_dict:
-                        lines_dict[top_key] = []
-                    lines_dict[top_key].append(w)
+                # Try layout text extraction first for multi-column / colored PDFs
+                layout_text = page.extract_text(layout=True)
+                if layout_text and len(layout_text.strip()) > 50:
+                    for line_idx, line in enumerate(layout_text.splitlines()):
+                        clean_l = sanitize_text(line)
+                        if clean_l:
+                            blocks_data.append({
+                                "page": page_idx + 1,
+                                "block_id": len(blocks_data),
+                                "text": clean_l,
+                                "x0": 40.0,
+                                "y0": round(40.0 + line_idx * 15, 2),
+                                "x1": round(page.width * 0.85, 2),
+                                "y1": round(40.0 + line_idx * 15 + 12, 2),
+                                "width": round(page.width * 0.75, 2),
+                                "height": 12.0,
+                                "font_name": "pdfplumber-Layout",
+                                "font_size": 10.0,
+                                "is_bold": False,
+                                "page_width": round(page.width, 2),
+                                "page_height": round(page.height, 2)
+                            })
 
-                for top_key, line_words in lines_dict.items():
-                    line_words.sort(key=lambda x: x["x0"])
-                    line_text = " ".join(w["text"] for w in line_words).strip()
-                    clean_line = sanitize_text(line_text)
-                    if not clean_line:
-                        continue
+                if not blocks_data:
+                    words = page.extract_words(keep_blank_chars=True, extra_attrs=["fontname", "size"])
+                    lines_dict = {}
+                    for w in words:
+                        top_key = round(w["top"] / 4) * 4
+                        if top_key not in lines_dict:
+                            lines_dict[top_key] = []
+                        lines_dict[top_key].append(w)
 
-                    min_x0 = min(w["x0"] for w in line_words)
-                    max_x1 = max(w["x1"] for w in line_words)
-                    max_size = max(w.get("size", 10) for w in line_words)
-                    font_name = line_words[0].get("fontname", "Helvetica")
+                    for top_key, line_words in lines_dict.items():
+                        line_words.sort(key=lambda x: x["x0"])
+                        line_text = " ".join(w["text"] for w in line_words).strip()
+                        clean_line = sanitize_text(line_text)
+                        if not clean_line:
+                            continue
 
-                    blocks_data.append({
-                        "page": page_idx + 1,
-                        "block_id": len(blocks_data),
-                        "text": clean_line,
-                        "x0": round(min_x0, 2),
-                        "y0": round(top_key, 2),
-                        "x1": round(max_x1, 2),
-                        "y1": round(top_key + 12, 2),
-                        "width": round(max_x1 - min_x0, 2),
-                        "height": 12,
-                        "font_name": font_name,
-                        "font_size": round(max_size, 2),
-                        "is_bold": "bold" in font_name.lower(),
-                        "page_width": round(page.width, 2),
-                        "page_height": round(page.height, 2)
-                    })
+                        min_x0 = min(w["x0"] for w in line_words)
+                        max_x1 = max(w["x1"] for w in line_words)
+                        max_size = max(w.get("size", 10) for w in line_words)
+                        font_name = line_words[0].get("fontname", "Helvetica")
+
+                        blocks_data.append({
+                            "page": page_idx + 1,
+                            "block_id": len(blocks_data),
+                            "text": clean_line,
+                            "x0": round(min_x0, 2),
+                            "y0": round(top_key, 2),
+                            "x1": round(max_x1, 2),
+                            "y1": round(top_key + 12, 2),
+                            "width": round(max_x1 - min_x0, 2),
+                            "height": 12,
+                            "font_name": font_name,
+                            "font_size": round(max_size, 2),
+                            "is_bold": "bold" in font_name.lower(),
+                            "page_width": round(page.width, 2),
+                            "page_height": round(page.height, 2)
+                        })
     except Exception as e:
         logger.error(f"pdfplumber extraction failed: {e}")
 
@@ -276,45 +333,84 @@ def extract_blocks_pdfplumber(file_bytes: bytes) -> List[Dict[str, Any]]:
 
 
 # ==============================================================================
-# STAGE 6 — OCR & IMAGE PREPROCESSING PIPELINE (OpenCV)
+# STAGE 6 — OCR & IMAGE PREPROCESSING PIPELINE (OpenCV + Pytesseract / PyMuPDF OCR)
 # ==============================================================================
 def preprocess_image_opencv(image_np: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
-    coords = np.column_stack(np.where(gray < 245))
+    
+    # Check if image is dark background with light text (invert if mean gray < 127)
+    if np.mean(gray) < 127:
+        gray = cv2.bitwise_not(gray)
+        
+    coords = np.column_stack(np.where(gray < 240))
     if len(coords) > 0:
         angle = cv2.minAreaRect(coords)[-1]
         if angle < -45:
             angle = -(90 + angle)
+        elif angle > 45:
+            angle = 90 - angle
         else:
             angle = -angle
-        (h, w) = gray.shape[:2]
-        center = (w // 2, h // 2)
-        M = cv2.getRotationMatrix2D(center, angle, 1.0)
-        gray = cv2.warpAffine(gray, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        if abs(angle) > 0.5 and abs(angle) < 15:
+            (h, w) = gray.shape[:2]
+            center = (w // 2, h // 2)
+            M = cv2.getRotationMatrix2D(center, angle, 1.0)
+            gray = cv2.warpAffine(gray, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
-    denoised = cv2.fastNlMeansDenoising(gray, h=10)
+    denoised = cv2.fastNlMeansDenoising(gray, h=8)
     thresh = cv2.adaptiveThreshold(denoised, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     return thresh
 
 
 def extract_ocr_fallback(doc: fitz.Document) -> List[Dict[str, Any]]:
     blocks_data = []
-    logger.info("Executing OCR Fallback Pipeline...")
+    logger.info("Executing Advanced OCR & Color Image Extraction Fallback...")
+
+    # Check for pytesseract availability
+    has_pytesseract = False
+    try:
+        import pytesseract
+        has_pytesseract = True
+    except ImportError:
+        has_pytesseract = False
 
     for page_idx, page in enumerate(doc):
         pix = page.get_pixmap(dpi=300)
         img_np = np.frombuffer(pix.samples, dtype=np.uint8).reshape((pix.height, pix.width, pix.n))
         processed_img = preprocess_image_opencv(img_np)
 
-        page_ocr_text = page.get_text("text")
-        if page_ocr_text.strip():
-            lines = page_ocr_text.splitlines()
+        ocr_text = ""
+
+        if has_pytesseract:
+            try:
+                import pytesseract
+                ocr_text = pytesseract.image_to_string(processed_img)
+            except Exception as pe:
+                logger.warning(f"pytesseract OCR execution warning: {pe}")
+
+        if not ocr_text.strip():
+            # Fallback to PyMuPDF rawdict line extraction with clip-box preservation
+            try:
+                raw_dict = page.get_text("rawdict")
+                extracted_lines = []
+                for b in raw_dict.get("blocks", []):
+                    if b.get("type") == 0:
+                        for l in b.get("lines", []):
+                            line_str = "".join(s.get("text", "") for s in l.get("spans", []))
+                            if line_str.strip():
+                                extracted_lines.append(line_str)
+                ocr_text = "\n".join(extracted_lines)
+            except Exception:
+                ocr_text = page.get_text("text")
+
+        if ocr_text.strip():
+            lines = ocr_text.splitlines()
             for line_idx, line in enumerate(lines):
                 clean_line = sanitize_text(line)
                 if clean_line:
                     blocks_data.append({
                         "page": page_idx + 1,
-                        "block_id": line_idx,
+                        "block_id": len(blocks_data),
                         "text": clean_line,
                         "x0": 50.0,
                         "y0": round(50.0 + line_idx * 18, 2),
