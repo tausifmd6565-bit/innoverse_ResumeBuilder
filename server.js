@@ -258,37 +258,65 @@ app.post('/api/generate-resume', async (req, res) => {
     }
 });
 
-// AI Write endpoint for individual fields
+// AI Write endpoint for individual fields & roadmaps
 app.post('/api/ai-write', async (req, res) => {
     try {
         const { field, context } = req.body;
         const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-        if (!GROQ_API_KEY) {
-            return res.status(503).json({ error: 'AI service not configured. Please set GROQ_API_KEY.' });
+        const isLongOutput = field === 'fullResume' || field === 'fullEnhance' || field === 'roadmap' || field === 'parseResume';
+        const maxTokens = isLongOutput ? 3500 : 1000;
+
+        if (GROQ_API_KEY) {
+            const models = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'gemma2-9b-it'];
+            for (const model of models) {
+                try {
+                    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${GROQ_API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            model,
+                            messages: [
+                                { role: 'system', content: 'You are a world-class technical mentor, resume writer, and career coach. Write detailed, practical, structured content.' },
+                                { role: 'user', content: context }
+                            ],
+                            temperature: 0.7,
+                            max_tokens: maxTokens
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.choices && data.choices[0] && data.choices[0].message) {
+                            return res.json({ success: true, content: data.choices[0].message.content.trim() });
+                        }
+                    }
+                } catch (mErr) {
+                    console.warn(`[AI-Write] Model ${model} attempt failed:`, mErr.message);
+                }
+            }
         }
 
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${GROQ_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
-                messages: [
-                    { role: 'system', content: 'You are a professional resume writer and ATS optimization expert. Write concise, impactful, ATS-friendly content. Use strong action verbs. Be realistic and do not invent fake information.' },
-                    { role: 'user', content: context }
-                ],
-                temperature: 0.7,
-                max_tokens: field === 'fullResume' || field === 'fullEnhance' ? 3000 : 800
-            })
-        });
+        // Fallback for roadmap if AI key missing or rate-limited
+        if (field === 'roadmap') {
+            const fallbackRoadmap = `🚀 12-WEEK SKILL MASTERY ROADMAP\n\n` +
+                `MONTH 1: FOUNDATION & CORE CONCEPTS (Weeks 1 - 4)\n` +
+                `• Week 1-2: Core syntax, environment setup, and fundamental concepts.\n` +
+                `• Week 3-4: Hands-on mini project implementing core patterns.\n\n` +
+                `MONTH 2: INTERMEDIATE ARCHITECTURE & TOOLS (Weeks 5 - 8)\n` +
+                `• Week 5-6: Deep dive into standard libraries, frameworks, and APIs.\n` +
+                `• Week 7-8: Build a full-stack portfolio application with database integration.\n\n` +
+                `MONTH 3: ADVANCED OPTIMIZATION & ATS RESUME PROJECTS (Weeks 9 - 12)\n` +
+                `• Week 9-10: Testing, debugging, performance tuning, and CI/CD basics.\n` +
+                `• Week 11-12: Capstone project deployment, documentation, and interview practice.`;
 
-        if (!response.ok) throw new Error('Groq API error');
+            return res.json({ success: true, content: fallbackRoadmap });
+        }
 
-        const data = await response.json();
-        res.json({ success: true, content: data.choices[0].message.content.trim() });
+        res.status(503).json({ error: 'AI service unavailable', message: 'All AI models were unreachable or rate-limited.' });
 
     } catch (error) {
         res.status(500).json({ error: 'AI generation failed', message: error.message });
