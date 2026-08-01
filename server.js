@@ -300,23 +300,10 @@ app.post('/api/ai-write', async (req, res) => {
             }
         }
 
-        // Fallback for roadmap if AI key missing or rate-limited
-        if (field === 'roadmap') {
-            const fallbackRoadmap = `🚀 12-WEEK SKILL MASTERY ROADMAP\n\n` +
-                `MONTH 1: FOUNDATION & CORE CONCEPTS (Weeks 1 - 4)\n` +
-                `• Week 1-2: Core syntax, environment setup, and fundamental concepts.\n` +
-                `• Week 3-4: Hands-on mini project implementing core patterns.\n\n` +
-                `MONTH 2: INTERMEDIATE ARCHITECTURE & TOOLS (Weeks 5 - 8)\n` +
-                `• Week 5-6: Deep dive into standard libraries, frameworks, and APIs.\n` +
-                `• Week 7-8: Build a full-stack portfolio application with database integration.\n\n` +
-                `MONTH 3: ADVANCED OPTIMIZATION & ATS RESUME PROJECTS (Weeks 9 - 12)\n` +
-                `• Week 9-10: Testing, debugging, performance tuning, and CI/CD basics.\n` +
-                `• Week 11-12: Capstone project deployment, documentation, and interview practice.`;
-
-            return res.json({ success: true, content: fallbackRoadmap });
-        }
-
-        res.status(503).json({ error: 'AI service unavailable', message: 'All AI models were unreachable or rate-limited.' });
+        res.status(503).json({
+            error: 'AI service unavailable',
+            message: 'AI API service is currently busy or rate-limited. Please try again in a few moments to generate your custom AI roadmap.'
+        });
 
     } catch (error) {
         res.status(500).json({ error: 'AI generation failed', message: error.message });

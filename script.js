@@ -2772,10 +2772,32 @@ async function generateAIRoadmap() {
     const generateBtn = document.getElementById('generateRoadmapBtn');
 
     generateBtn.disabled = true;
-    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Roadmap...';
-    roadmapBox.innerHTML = '<div class="roadmap-loading"><i class="fas fa-cog fa-spin"></i> AI is constructing your weekly learning roadmap...</div>';
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing Skill Gaps & Generating AI Roadmap...';
+    roadmapBox.innerHTML = '<div class="roadmap-loading"><i class="fas fa-brain fa-spin"></i> AI mentor is building a 100% personalized 12-week roadmap for ' + role + '...</div>';
 
-    const prompt = `You are a world-class technical mentor. The student wants to become a "${role}" but lacks the following skills:\n${missing.join(', ') || 'Advanced Tech Concepts'}\n\nPlease generate a highly detailed, practical, week-by-week 3-month (12 weeks) learning roadmap in clean, readable text. Format it clearly, with week ranges, objectives, recommended projects, and milestones. Do not write any HTML tags. Use plain text formatting only. Start directly with the roadmap title.`;
+    const presentSkills = (state.formData.skills && state.formData.skills.length > 0) ? state.formData.skills.join(', ') : 'Fundamental Tech Knowledge';
+    const missingSkillsStr = missing.length > 0 ? missing.join(', ') : 'Advanced Production Tools & Industry Standards';
+
+    const prompt = `You are an elite AI technical career strategist and hiring mentor.
+The candidate is applying for the position: "${role}".
+Current Candidate Skills: ${presentSkills}
+Critical Missing Skills Identified from ATS Skill Gap Analysis: ${missingSkillsStr}
+
+Please generate a highly customized 12-Week (3-Month) Skill Mastery Roadmap specifically tailored to help this candidate master ${missingSkillsStr} for the "${role}" role.
+
+Structure:
+MONTH 1: FOUNDATIONS & CORE CONCEPTS (Weeks 1 - 4)
+• Focus on mastering core fundamentals of ${missingSkillsStr}.
+
+MONTH 2: INTERMEDIATE ARCHITECTURE & REAL-WORLD PROJECTS (Weeks 5 - 8)
+• Hands-on project implementation combining present skills (${presentSkills}) with newly learned tools (${missingSkillsStr}).
+
+MONTH 3: PRODUCTION ATS CAPSTONE PROJECTS & INTERVIEW PREPARATION (Weeks 9 - 12)
+• Advanced portfolio project deployment, resume optimization, and mock interview questions for ${role}.
+
+Rules:
+- Make every single week specific to the missing skills (${missingSkillsStr}) and target role (${role}).
+- Format clearly in clean plain text with bold bullet points. Do NOT use HTML or markdown code blocks.`;
 
     try {
         const response = await fetch('/api/ai-write', {
@@ -2783,14 +2805,17 @@ async function generateAIRoadmap() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ field: 'roadmap', context: prompt })
         });
-        if (!response.ok) throw new Error('API failed');
+        
         const resData = await response.json();
+        if (!response.ok || !resData.success) {
+            throw new Error(resData.message || 'AI Roadmap service temporarily busy.');
+        }
         
         roadmapBox.innerHTML = `<pre class="roadmap-text">${resData.content}</pre>`;
-        showToast('Roadmap generated successfully! 🚀');
+        showToast(`AI Roadmap generated for ${role}! 🚀`);
     } catch (e) {
         console.error(e);
-        roadmapBox.innerHTML = '<p class="roadmap-hint" style="color:#ef4444;">Failed to generate AI roadmap. Please try again.</p>';
+        roadmapBox.innerHTML = `<div class="roadmap-hint" style="color:#ef4444; padding: 16px; text-align: center;"><i class="fas fa-exclamation-circle"></i> <strong>AI Roadmap Generation Error:</strong> ${e.message || 'AI service is temporarily busy. Please click Generate AI Roadmap again.'}</div>`;
     } finally {
         generateBtn.disabled = false;
         generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate AI Roadmap';
