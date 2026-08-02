@@ -1493,7 +1493,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                 <div class="cc-main">
                     <div class="cc-header">
                         <div class="cc-name">${data.fullName || 'Your Name'}</div>
-                        <div class="cc-applying">Applying For: ${data.targetRole || 'Campus Club Member'}</div>
+                        <div class="cc-applying">${data.targetRole || 'Campus Club Member'}</div>
                     </div>
                     ${section('Why I Want To Join', data.motivation)}
                     ${!ccMoveEdu ? `
@@ -1518,7 +1518,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="cm-photo-wrap">${photoHTML}</div>
                         <div class="cm-header-name-role">
                             <div class="cm-name">${data.fullName || 'Your Name'}</div>
-                            <div class="cm-applying">Applying For: ${data.targetRole || 'Campus Role'}</div>
+                            <div class="cm-applying">${data.targetRole || 'Campus Role'}</div>
                         </div>
                     </div>
                     <div class="cm-header-right">
@@ -2203,21 +2203,38 @@ async function enhanceSection(sectionKey, btn) {
     else if (sectionKey === 'certifications') { sectionVal = parsed.certifications || ''; label = 'Certifications'; }
     else if (sectionKey === 'skills') { sectionVal = parsed.skills ? parsed.skills.join(', ') : (parsed.skillsText || ''); label = 'Skills'; }
 
-    if (!sectionVal) {
-        showToast(`No content found in ${label} section to enhance.`);
-        return;
-    }
-
     btn.disabled = true;
     const oldHtml = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enhancing...';
     els.aiGeneratingPopup.classList.add('active');
 
+    const role = state.formData.targetRole || parsed.targetRole || 'Professional';
+    const degree = state.formData.personalDetails?.degree || parsed.degree || 'Degree Candidate';
+    const presentSkills = (state.formData.skills && state.formData.skills.length > 0) ? state.formData.skills.join(', ') : (parsed.skills ? parsed.skills.join(', ') : 'Relevant Technologies');
+
     let prompt = '';
-    if (sectionKey === 'skills') {
-        prompt = `You are a professional resume writer. Format, optimize, and expand this comma-separated list of skills for maximum ATS compatibility: "${sectionVal}". Add 2-3 relevant high-value industry-standard technical skills if applicable. Return ONLY the improved skills as a comma-separated list. No intro, no formatting, no conversational text.`;
+    if (!sectionVal) {
+        // Section is missing — generate a fresh, tailored section for the candidate's target role
+        if (sectionKey === 'certifications') {
+            prompt = `You are a professional resume writer. The candidate is targeting the role "${role}" with skills in "${presentSkills}". The resume currently has NO Certifications section. Generate 2-3 industry-standard, realistic certifications relevant to a "${role}" position (e.g. AWS, Meta, Google, Microsoft, IBM, Coursera certificates). Format as concise bullet points or clean list. Return ONLY the new certifications list without intro or markdown blocks.`;
+        } else if (sectionKey === 'achievements') {
+            prompt = `You are a professional resume writer. The candidate is targeting the role "${role}". The resume has NO Achievements section. Generate 2-3 impressive, realistic academic or professional accomplishments/awards relevant to "${role}" with quantifiable metrics (e.g. hackathon winner, top rank, performance boost). Return ONLY the new achievements list without intro or markdown blocks.`;
+        } else if (sectionKey === 'projects') {
+            prompt = `You are a professional resume writer. The candidate is targeting the role "${role}". Generate 2 realistic, high-impact projects relevant to "${role}" featuring technologies "${presentSkills}". Format clearly with project titles, key features, and tools used. Return ONLY the projects text.`;
+        } else if (sectionKey === 'experience') {
+            prompt = `You are a professional resume writer. Generate realistic, relevant professional experience/internship bullet points for a "${role}" candidate. Include company role, responsibilities, and key achievements. Return ONLY the experience text.`;
+        } else if (sectionKey === 'summary') {
+            prompt = `You are a professional resume writer. Write a powerful, 2-3 sentence ATS-friendly professional summary for a "${role}" candidate specializing in "${presentSkills}". Return ONLY the summary text.`;
+        } else if (sectionKey === 'skills') {
+            prompt = `You are a professional resume writer. Generate 6-10 industry-standard technical skills for a "${role}" candidate as a comma-separated list. Return ONLY the comma-separated list.`;
+        }
+        showToast(`Generating new AI ${label} section for your resume... ✨`);
     } else {
-        prompt = `You are a professional resume writer. Enhance the following resume "${label}" section to sound highly professional, metrics-driven (where possible), grammatically perfect, and optimized for ATS keywords:\n\n"${sectionVal}"\n\nDo NOT invent new qualifications, companies, or credentials. Keep the core details exactly the same. Return ONLY the enhanced content, with no introductory text, conversational filler, markdown formatting, or headers.`;
+        if (sectionKey === 'skills') {
+            prompt = `You are a professional resume writer. Format, optimize, and expand this comma-separated list of skills for maximum ATS compatibility: "${sectionVal}". Add 2-3 relevant high-value industry-standard technical skills if applicable. Return ONLY the improved skills as a comma-separated list. No intro, no formatting, no conversational text.`;
+        } else {
+            prompt = `You are a professional resume writer. Enhance the following resume "${label}" section to sound highly professional, metrics-driven (where possible), grammatically perfect, and optimized for ATS keywords:\n\n"${sectionVal}"\n\nDo NOT invent new qualifications, companies, or credentials. Keep the core details exactly the same. Return ONLY the enhanced content, with no introductory text, conversational filler, markdown formatting, or headers.`;
+        }
     }
 
     try {
@@ -2241,10 +2258,10 @@ async function enhanceSection(sectionKey, btn) {
         els.editTextarea.value = serialized;
         state.resumeText = serialized;
         applyChanges();
-        showToast(`Enhanced ${label} section successfully! ✨`);
+        showToast(`Updated ${label} section in your resume! ✨`);
     } catch (e) {
         console.error(e);
-        showToast(`Failed to enhance ${label} section.`);
+        showToast(`Failed to update ${label} section.`);
     } finally {
         btn.disabled = false;
         btn.innerHTML = oldHtml;
