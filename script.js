@@ -1170,15 +1170,6 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'creative': {
-            const hasManySkills = (data.skills || []).length >= 7;
-            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.7 + 6;
-            const rightAnchorScore = _sectionScore(data.summary) * 0.4 + _sectionScore(data.experience) + _sectionScore(data.projects);
-
-            // Rebalance: If sidebar has 7+ skills, left sidebar is ALREADY full! Keep Education, Certifications, Achievements in Right Main Column!
-            const crMoveEdu = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
-            const crMoveCerts = !hasManySkills && (rightAnchorScore > leftAnchorScore + 6);
-            const crMoveAchievements = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
-
             const sidebarHTML = `
                 <div class="cr-sidebar">
                     <div class="cr-photo-wrap">${photoHTML}</div>
@@ -1188,14 +1179,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="cr-content">${skillsHTML}</div>
                     </div>
                     ${section('Languages', data.languages)}
-                    ${crMoveEdu ? `
-                    <div class="cr-section">
-                        <div class="cr-section-title">Education</div>
-                        <div class="cr-content">${getStructuredEducationHTML('cr', false)}</div>
-                    </div>` : ''}
                     ${data.additionalInfo ? section('Interests', data.additionalInfo) : ''}
-                    ${crMoveCerts ? section('Certifications', data.certifications) : ''}
-                    ${crMoveAchievements ? section('Achievements', data.achievements) : ''}
                 </div>
             `;
             const mainHTML = `
@@ -1206,15 +1190,14 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                     </div>
                     <div class="cr-right-content">
                         ${section('About Me', data.summary)}
-                        ${section('Experience', data.experience)}
-                        ${!crMoveEdu ? `
                         <div class="cr-section">
                             <div class="cr-section-title">Education</div>
                             <div class="cr-content">${getStructuredEducationHTML('cr', false)}</div>
-                        </div>` : ''}
+                        </div>
+                        ${section('Experience', data.experience)}
                         ${section('Projects', data.projects)}
-                        ${!crMoveCerts ? section('Certifications', data.certifications) : ''}
-                        ${!crMoveAchievements ? section('Achievements', data.achievements) : ''}
+                        ${section('Certifications', data.certifications)}
+                        ${section('Achievements', data.achievements)}
                     </div>
                 </div>
             `;
@@ -1222,13 +1205,6 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'minimalPro': {
-            const hasManySkills = (data.skills || []).length >= 7;
-            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.7 + 6;
-            const rightAnchorScore = _sectionScore(data.summary) * 0.4 + _sectionScore(data.experience) + _sectionScore(data.projects);
-
-            const mpMoveEdu = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
-            const mpMoveCerts = !hasManySkills && (rightAnchorScore > leftAnchorScore + 6);
-
             const sidebarHTML = `
                 <div class="mp-sidebar">
                     <div class="mp-photo-wrap">${photoHTML}</div>
@@ -1239,13 +1215,7 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                     </div>
                     ${section('Languages', data.languages)}
                     ${data.dob ? section('Date of Birth', data.dob) : ''}
-                    ${mpMoveEdu ? `
-                    <div class="mp-section">
-                        <div class="mp-section-title">Education</div>
-                        <div class="mp-content">${getStructuredEducationHTML('mp', true)}</div>
-                    </div>` : ''}
                     ${data.additionalInfo ? section('Additional Info', data.additionalInfo) : ''}
-                    ${mpMoveCerts ? section('Certifications', data.certifications) : ''}
                 </div>
             `;
             const mainHTML = `
@@ -1255,14 +1225,14 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="mp-role">${data.targetRole || 'Professional'}</div>
                     </div>
                     ${section('About Me', data.summary)}
-                    ${section('Work Experience', data.experience)}
-                    ${!mpMoveEdu ? `
                     <div class="mp-section">
                         <div class="mp-section-title">Education</div>
                         <div class="mp-content">${getStructuredEducationHTML('mp', true)}</div>
-                    </div>` : ''}
+                    </div>
+                    ${section('Work Experience', data.experience)}
                     ${section('Projects', data.projects)}
-                    ${!mpMoveCerts ? section('Certifications', data.certifications) : ''}
+                    ${section('Certifications', data.certifications)}
+                    ${section('Achievements', data.achievements)}
                 </div>
             `;
             outputHTML = `<div class="mp-resume ${densityClass}">${sidebarHTML}${mainHTML}</div>`;
@@ -1282,23 +1252,24 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                 <div class="eb-sidebar">
                     ${section('Contact', contactVerticalHTML)}
                     <div class="eb-section">
-                        <div class="eb-section-title">Education</div>
-                        <div class="eb-content">${getStructuredEducationHTML('eb', true)}</div>
-                    </div>
-                    <div class="eb-section">
                         <div class="eb-section-title">Skills</div>
                         <div class="eb-content">${skillsDotsHTML}</div>
                     </div>
-                    ${section('Certifications', data.certifications)}
+                    ${section('Languages', data.languages)}
                 </div>
             `;
             const mainHTML = `
                 <div class="eb-main">
                     ${headerCardHTML}
                     ${section('Professional Summary', data.summary)}
+                    <div class="eb-section">
+                        <div class="eb-section-title">Education</div>
+                        <div class="eb-content">${getStructuredEducationHTML('eb', true)}</div>
+                    </div>
                     ${section('Experience', data.experience)}
                     ${section('Projects', data.projects)}
-                    ${section('Languages', data.languages)}
+                    ${section('Certifications', data.certifications)}
+                    ${section('Achievements', data.achievements)}
                     ${section('References', data.references)}
                 </div>
             `;
@@ -1313,14 +1284,10 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                     <div class="dg-sidebar-content">
                         ${section('Contact', contactVerticalHTML)}
                         <div class="dg-section">
-                            <div class="dg-section-title">Education</div>
-                            <div class="dg-content">${getStructuredEducationHTML('dg', false)}</div>
-                        </div>
-                        <div class="dg-section">
                             <div class="dg-section-title">Skills</div>
                             <div class="dg-content">${skillsHTML}</div>
                         </div>
-                        ${section('Certifications', data.certifications)}
+                        ${section('Languages', data.languages)}
                     </div>
                 </div>
             `;
@@ -1331,23 +1298,25 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="dg-role">${data.targetRole || 'Professional'}</div>
                     </div>
                     ${section('Profile Summary', data.summary)}
+                    <div class="dg-section">
+                        <div class="dg-section-title">Education</div>
+                        <div class="dg-content">${getStructuredEducationHTML('dg', false)}</div>
+                    </div>
                     ${section('Experience', data.experience)}
                     ${section('Projects', data.projects)}
+                    ${section('Certifications', data.certifications)}
                     ${section('Awards', data.achievements)}
-                    ${section('Languages', data.languages)}
                 </div>
             `;
             outputHTML = `<div class="dg-resume ${densityClass}">${sidebarHTML}${mainHTML}</div>`;
             break;
         }
         case 'dualPanel': {
-            // Build skills with percentage alignment
             const dpSkillsRows = (data.skills || []).map((s, idx) => {
                 const pcts = [90, 87, 95, 84, 92, 88, 91];
                 return `<div class="dp-skill-row"><span>${s}</span><span>${pcts[idx % pcts.length]}%</span></div>`;
             }).join('');
 
-            // Build language circles helper
             const langItems = (data.languages || '').split(/[,\n]+/).map(l => l.trim()).filter(l => l);
             const langPcts = [94, 90, 84, 88, 86];
             const makeDpLanguageHTML = () => langItems.length > 0
@@ -1363,60 +1332,6 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                 }).join('')}</div>`
                 : '';
 
-            // Run column-balance algorithm
-            const dpBalanced = balanceDualPanelSections(data);
-            const dpLeftMoveable  = dpBalanced.filter(m => m.side === 'left');
-            const dpRightMoveable = dpBalanced.filter(m => m.side === 'right');
-
-            // Build LEFT extra sections (moveable sections assigned to left)
-            let dpLeftExtra = '';
-            for (const m of dpLeftMoveable) {
-                if (!m.text || !m.text.trim()) continue;
-                if (m.key === 'languages') {
-                    dpLeftExtra += langItems.length > 0 ? `
-                    <div class="dp-lsection">
-                        <div class="dp-pill-label">Language:</div>
-                        ${makeDpLanguageHTML()}
-                    </div>` : '';
-                } else {
-                    dpLeftExtra += `<div class="dp-lsection">
-                        <div class="dp-pill-label">${m.label}</div>
-                        <div class="dp-lcontent">${m.text.replace(/\n/g, '<br>')}</div>
-                    </div>`;
-                }
-            }
-
-            // Build RIGHT content — fixed sections always in right
-            let dpRightContent = '';
-            if (data.experience && data.experience.trim()) {
-                dpRightContent += `<div class="dp-rsection">
-                    <div class="dp-pill-label">Professional Experience:</div>
-                    <div class="dp-rcontent">${data.experience.replace(/\n/g, '<br>')}</div>
-                </div>`;
-            }
-            if (data.projects && data.projects.trim()) {
-                dpRightContent += `<div class="dp-rsection">
-                    <div class="dp-pill-label">Projects:</div>
-                    <div class="dp-rcontent">${data.projects.replace(/\n/g, '<br>')}</div>
-                </div>`;
-            }
-            // Add moveable sections assigned to right
-            for (const m of dpRightMoveable) {
-                if (!m.text || !m.text.trim()) continue;
-                if (m.key === 'languages') {
-                    dpRightContent += langItems.length > 0 ? `<div class="dp-rsection">
-                        <div class="dp-pill-label">${m.label}</div>
-                        <div class="dp-rcontent">${makeDpLanguageHTML()}</div>
-                    </div>` : '';
-                } else {
-                    dpRightContent += `<div class="dp-rsection">
-                        <div class="dp-pill-label">${m.label}</div>
-                        <div class="dp-rcontent">${m.text.replace(/\n/g, '<br>')}</div>
-                    </div>`;
-                }
-            }
-
-            // Split name into first and last for premium display
             const nameParts = (data.fullName || 'Your Name').split(' ');
             const firstName = nameParts[0] || '';
             const lastName = nameParts.slice(1).join(' ') || '';
@@ -1445,17 +1360,23 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                                     <div class="dp-lcontent">${dpSkillsRows}</div>
                                 </div>
                                 <div class="dp-lsection">
-                                    <div class="dp-pill-label">Education:</div>
-                                    <div class="dp-lcontent">${getStructuredEducationHTML('dp', true)}</div>
+                                    <div class="dp-pill-label">Languages:</div>
+                                    <div class="dp-lcontent">${makeDpLanguageHTML()}</div>
                                 </div>
-                                ${dpLeftExtra}
                                 <div class="dp-contact-block">
                                     ${contactVerticalHTML}
                                 </div>
                             </div>
                         </div>
                         <div class="dp-right">
-                            ${dpRightContent}
+                            <div class="dp-rsection">
+                                <div class="dp-pill-label">Education:</div>
+                                <div class="dp-rcontent">${getStructuredEducationHTML('dp', true)}</div>
+                            </div>
+                            ${data.experience && data.experience.trim() ? `<div class="dp-rsection"><div class="dp-pill-label">Experience:</div><div class="dp-rcontent">${data.experience.replace(/\n/g, '<br>')}</div></div>` : ''}
+                            ${data.projects && data.projects.trim() ? `<div class="dp-rsection"><div class="dp-pill-label">Projects:</div><div class="dp-rcontent">${data.projects.replace(/\n/g, '<br>')}</div></div>` : ''}
+                            ${data.certifications && data.certifications.trim() ? `<div class="dp-rsection"><div class="dp-pill-label">Certifications:</div><div class="dp-rcontent">${data.certifications.replace(/\n/g, '<br>')}</div></div>` : ''}
+                            ${data.achievements && data.achievements.trim() ? `<div class="dp-rsection"><div class="dp-pill-label">Achievements:</div><div class="dp-rcontent">${data.achievements.replace(/\n/g, '<br>')}</div></div>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1463,31 +1384,16 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'campusClub': {
-            const rawLeft  = _sectionScore(data.summary) + (data.skills || []).length * 0.8 + 3;
-            const rawRight = _sectionScore(data.motivation) + _sectionScore(data.campusInvolvement) + _sectionScore(data.projects) + _sectionScore(data.achievements) + _sectionScore(data.languages) + 4;
-
-            const diff = rawRight - rawLeft;
-            const ccMoveEdu = diff > 5;
-            const ccMoveAchv = data.achievements && (diff > 3 || ccMoveEdu);
-            const ccMoveLangs = data.languages && (diff > 4 || ccMoveEdu);
-
             const sidebarHTML = `
                 <div class="cc-sidebar">
                     <div class="cc-photo-wrap">${photoHTML}</div>
-                    ${section('About Me', data.summary)}
                     ${section('Contact', contactVerticalHTML)}
                     <div class="cc-section">
                         <div class="cc-section-title">Skills</div>
                         <div class="cc-content">${skillsHTML}</div>
                     </div>
-                    ${ccMoveEdu ? `
-                    <div class="cc-section">
-                        <div class="cc-section-title">Education</div>
-                        <div class="cc-content">${getStructuredEducationHTML('cc', false)}</div>
-                    </div>` : ''}
+                    ${section('Languages', data.languages)}
                     ${data.additionalInfo ? section('Interests', data.additionalInfo) : ''}
-                    ${ccMoveAchv  ? section('Achievements', data.achievements) : ''}
-                    ${ccMoveLangs ? section('Languages',    data.languages)    : ''}
                 </div>
             `;
             const mainHTML = `
@@ -1497,16 +1403,14 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="cc-applying">${data.targetRole || 'Campus Club Member'}</div>
                     </div>
                     ${section('Why I Want To Join', data.motivation)}
-                    ${!ccMoveEdu ? `
                     <div class="cc-section">
                         <div class="cc-section-title">Education</div>
                         <div class="cc-content">${getStructuredEducationHTML('cc', false)}</div>
-                    </div>` : ''}
+                    </div>
                     ${section('Relevant Coursework', data.coursework)}
                     ${section('Previous Club Experience', data.campusInvolvement)}
                     ${section('Projects & Contributions', data.projects)}
-                    ${!ccMoveAchv  ? section('Achievements', data.achievements) : ''}
-                    ${!ccMoveLangs ? section('Languages',    data.languages)    : ''}
+                    ${section('Achievements', data.achievements)}
                 </div>
             `;
             outputHTML = `<div class="cc-resume ${densityClass}">${sidebarHTML}${mainHTML}</div>`;
@@ -1569,24 +1473,14 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'campusAchiever': {
-            // Balance: if right much longer than left, move some content to sidebar
-            const caLeftScore  = (data.skills || []).length * 0.8 + 4; // edu + skills are always in left
-            const caRightScore = _sectionScore(data.summary) + _sectionScore(data.motivation) + _sectionScore(data.campusInvolvement) + _sectionScore(data.achievements);
-            const caMoveAchv   = data.achievements && (caRightScore - caLeftScore) > 5;
-
             const sidebarHTML = `
                 <div class="ca-sidebar">
                     <div class="ca-photo-wrap">${photoHTML}</div>
-                    <div class="ca-section">
-                        <div class="ca-section-title">Education</div>
-                        <div class="ca-content">${getStructuredEducationHTML('ca', true)}</div>
-                    </div>
                     <div class="ca-section">
                         <div class="ca-section-title">Skills</div>
                         <div class="ca-content">${skillsHTML}</div>
                     </div>
                     ${section('Languages', data.languages)}
-                    ${caMoveAchv ? section('Achievements', data.achievements) : ''}
                     ${section('Contact', contactVerticalHTML)}
                 </div>
             `;
@@ -1597,23 +1491,19 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="ca-status">Current Status: ${state.formData.year || 'Student'} · ${data.degree || ''}</div>
                     </div>
                     ${section('About Me', data.summary)}
+                    <div class="ca-section">
+                        <div class="ca-section-title">Education</div>
+                        <div class="ca-content">${getStructuredEducationHTML('ca', true)}</div>
+                    </div>
                     ${section('Why I Want To Join', data.motivation)}
                     ${section('Campus Involvement', data.campusInvolvement)}
-                    ${!caMoveAchv ? section('Achievements', data.achievements) : ''}
+                    ${section('Achievements', data.achievements)}
                 </div>
             `;
             outputHTML = `<div class="ca-resume ${densityClass}">${sidebarHTML}${mainHTML}</div>`;
             break;
         }
         case 'boldBlue': {
-            const hasManySkills = (data.skills || []).length >= 7;
-            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.7 + 6;
-            const rightAnchorScore = _sectionScore(data.summary) * 0.4 + _sectionScore(data.experience) + _sectionScore(data.projects);
-
-            const bbMoveEdu = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
-            const bbMoveCerts = !hasManySkills && (rightAnchorScore > leftAnchorScore + 6);
-            const bbMoveAchv = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
-
             const sidebarHTML = `
                 <div class="bb-sidebar">
                     <div class="bb-photo-wrap">${photoHTML}</div>
@@ -1623,13 +1513,6 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                         <div class="bb-content">${skillsHTML}</div>
                     </div>
                     ${section('Languages', data.languages)}
-                    ${bbMoveEdu ? `
-                    <div class="bb-section">
-                        <div class="bb-section-title">Education</div>
-                        <div class="bb-content">${getStructuredEducationHTML('bb', true)}</div>
-                    </div>` : ''}
-                    ${bbMoveCerts ? section('Certifications', data.certifications) : ''}
-                    ${bbMoveAchv  ? section('Achievements', data.achievements)    : ''}
                 </div>
             `;
             const mainHTML = `
@@ -1640,15 +1523,14 @@ function buildResumeHTML(data, templateId, isPreview = false) {
                     </div>
                     <div class="bb-right-content">
                         ${section('About Me', data.summary)}
-                        ${section('Work Experience', data.experience)}
-                        ${!bbMoveEdu ? `
                         <div class="bb-section">
                             <div class="bb-section-title">Education</div>
                             <div class="bb-content">${getStructuredEducationHTML('bb', true)}</div>
-                        </div>` : ''}
+                        </div>
+                        ${section('Work Experience', data.experience)}
                         ${section('Projects', data.projects)}
-                        ${!bbMoveCerts ? section('Certifications', data.certifications) : ''}
-                        ${!bbMoveAchv  ? section('Achievements', data.achievements)    : ''}
+                        ${section('Certifications', data.certifications)}
+                        ${section('Achievements', data.achievements)}
                     </div>
                 </div>
             `;
