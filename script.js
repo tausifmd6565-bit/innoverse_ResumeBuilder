@@ -948,17 +948,17 @@ function parseResumeText(text) {
 // ============================================
 function getContentDensity(data) {
     let score = 0;
-    if (data.summary && data.summary.trim().length > 0) score += Math.min(data.summary.trim().length / 60, 4);
-    if (data.experience && data.experience.trim().length > 0) score += Math.min(data.experience.trim().length / 100, 6);
-    if (data.projects && data.projects.trim().length > 0) score += Math.min(data.projects.trim().length / 100, 6);
-    if (data.education && data.education.trim().length > 0) score += Math.min(data.education.trim().length / 80, 4);
-    if (data.skills && data.skills.length > 0) score += Math.min(data.skills.length * 0.4, 4);
-    if (data.certifications && data.certifications.trim().length > 0) score += 2;
-    if (data.achievements && data.achievements.trim().length > 0) score += 2;
-    if (data.campusInvolvement && data.campusInvolvement.trim().length > 0) score += 2;
+    if (data.summary && data.summary.trim().length > 0) score += Math.min(data.summary.trim().length / 50, 5);
+    if (data.experience && data.experience.trim().length > 0) score += Math.min(data.experience.trim().length / 80, 6);
+    if (data.projects && data.projects.trim().length > 0) score += Math.min(data.projects.trim().length / 80, 6);
+    if (data.education && data.education.trim().length > 0) score += Math.min(data.education.trim().length / 60, 4);
+    if (data.skills && data.skills.length > 0) score += Math.min(data.skills.length * 0.5, 6);
+    if (data.certifications && data.certifications.trim().length > 0) score += 3;
+    if (data.achievements && data.achievements.trim().length > 0) score += 3;
+    if (data.campusInvolvement && data.campusInvolvement.trim().length > 0) score += 3;
     
-    if (score < 11) return 'low';
-    if (score > 22) return 'high';
+    if (score < 10) return 'low';
+    if (score > 16) return 'high';
     return 'medium';
 }
 
@@ -1170,14 +1170,14 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'creative': {
-            // Anchor items: Left = Contact, Languages, Skills | Right = Summary, Experience, Projects
-            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.6 + 5;
+            const hasManySkills = (data.skills || []).length >= 7;
+            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.7 + 6;
             const rightAnchorScore = _sectionScore(data.summary) * 0.4 + _sectionScore(data.experience) + _sectionScore(data.projects);
 
-            // Rebalance Education, Certifications, Achievements: put them in whichever column is currently shorter!
-            const crMoveEdu = rightAnchorScore > leftAnchorScore + 3; // move to left sidebar ONLY if right is significantly longer
-            const crMoveCerts = data.certifications && (rightAnchorScore > leftAnchorScore + 2);
-            const crMoveAchievements = data.achievements && (rightAnchorScore > leftAnchorScore + 4);
+            // Rebalance: If sidebar has 7+ skills, left sidebar is ALREADY full! Keep Education, Certifications, Achievements in Right Main Column!
+            const crMoveEdu = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
+            const crMoveCerts = !hasManySkills && (rightAnchorScore > leftAnchorScore + 6);
+            const crMoveAchievements = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
 
             const sidebarHTML = `
                 <div class="cr-sidebar">
@@ -1222,11 +1222,12 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'minimalPro': {
-            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.6 + 5;
+            const hasManySkills = (data.skills || []).length >= 7;
+            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.7 + 6;
             const rightAnchorScore = _sectionScore(data.summary) * 0.4 + _sectionScore(data.experience) + _sectionScore(data.projects);
 
-            const mpMoveEdu = rightAnchorScore > leftAnchorScore + 3;
-            const mpMoveCerts = data.certifications && (rightAnchorScore > leftAnchorScore + 2);
+            const mpMoveEdu = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
+            const mpMoveCerts = !hasManySkills && (rightAnchorScore > leftAnchorScore + 6);
 
             const sidebarHTML = `
                 <div class="mp-sidebar">
@@ -1605,12 +1606,13 @@ function buildResumeHTML(data, templateId, isPreview = false) {
             break;
         }
         case 'boldBlue': {
-            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.6 + 5;
+            const hasManySkills = (data.skills || []).length >= 7;
+            const leftAnchorScore  = _sectionScore(data.languages) + (data.skills || []).length * 0.7 + 6;
             const rightAnchorScore = _sectionScore(data.summary) * 0.4 + _sectionScore(data.experience) + _sectionScore(data.projects);
 
-            const bbMoveEdu = rightAnchorScore > leftAnchorScore + 3;
-            const bbMoveCerts = data.certifications && (rightAnchorScore > leftAnchorScore + 2);
-            const bbMoveAchv = data.achievements && (rightAnchorScore > leftAnchorScore + 4);
+            const bbMoveEdu = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
+            const bbMoveCerts = !hasManySkills && (rightAnchorScore > leftAnchorScore + 6);
+            const bbMoveAchv = !hasManySkills && (rightAnchorScore > leftAnchorScore + 8);
 
             const sidebarHTML = `
                 <div class="bb-sidebar">
