@@ -990,12 +990,56 @@ textarea.inp { resize: vertical; min-height: 100px; line-height: 1.6; }
     --padding-scale: 1 !important;
 }
 .density-high {
-    --section-gap: 14px !important;
-    --item-gap: 6px !important;
-    --font-scale: 0.9 !important;
-    --header-gap: 16px !important;
-    --line-height: 1.4 !important;
-    --padding-scale: 0.82 !important;
+    --section-gap: 12px !important;
+    --item-gap: 5px !important;
+    --font-scale: 0.88 !important;
+    --header-gap: 14px !important;
+    --line-height: 1.36 !important;
+    --padding-scale: 0.75 !important;
+}
+
+/* Specific component overrides under high density */
+.density-high .cr-sidebar, .density-high .mp-sidebar, .density-high .bb-sidebar, .density-high .ca-sidebar, .density-high .cc-sidebar {
+    padding: 20px 22px !important;
+    gap: 12px !important;
+}
+.density-high .cr-right-content, .density-high .mp-main, .density-high .bb-right-content, .density-high .ca-main, .density-high .cc-main {
+    padding: 20px 24px !important;
+    gap: 12px !important;
+}
+.density-high .cr-section, .density-high .mp-section, .density-high .bb-section, .density-high .ca-section, .density-high .cc-section {
+    margin-bottom: 8px !important;
+}
+.density-high .cr-content, .density-high .mp-content, .density-high .bb-content, .density-high .ca-content, .density-high .cc-content {
+    font-size: 0.78rem !important;
+    line-height: 1.36 !important;
+}
+.density-high .cr-section-title, .density-high .mp-section-title, .density-high .bb-section-title, .density-high .ca-section-title, .density-high .cc-section-title {
+    font-size: 0.85rem !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 3px !important;
+}
+.density-high .cr-skill-tag, .density-high .mp-skill-tag, .density-high .skill-tag, .density-high .skill-pill {
+    padding: 2px 6px !important;
+    font-size: 0.7rem !important;
+    margin: 1px !important;
+}
+
+/* Specific component overrides under low density (sparse content) */
+.density-low .cr-sidebar, .density-low .mp-sidebar, .density-low .bb-sidebar, .density-low .ca-sidebar {
+    padding: 36px 32px !important;
+    gap: 24px !important;
+}
+.density-low .cr-right-content, .density-low .mp-main, .density-low .bb-right-content, .density-low .ca-main {
+    padding: 36px 32px !important;
+    gap: 24px !important;
+}
+.density-low .cr-content, .density-low .mp-content, .density-low .bb-content, .density-low .ca-content {
+    font-size: 0.88rem !important;
+    line-height: 1.68 !important;
+}
+.density-low .cr-section, .density-low .mp-section, .density-low .bb-section, .density-low .ca-section {
+    margin-bottom: 22px !important;
 }
 
 /* ============================================
