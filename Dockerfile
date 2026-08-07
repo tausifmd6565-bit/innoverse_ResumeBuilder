@@ -1,5 +1,5 @@
 # ==============================================================================
-# Production Dockerfile for AI Resume Builder & Python Resume Intelligence Engine
+# Production Dockerfile for CareerPathOS & Python Resume Intelligence Engine
 # Packages Node.js 20 + Python 3.11 + OpenCV + PyMuPDF + pdfplumber + Express
 # ==============================================================================
 

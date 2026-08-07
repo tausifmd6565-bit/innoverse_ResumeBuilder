@@ -1,7 +1,7 @@
 {
-  "name": "ai-resume-builder-innoverse-amu",
-  "version": "1.0.0",
-  "description": "AI-powered resume builder for students - Campus Club, Internship, Job, Academic, and Freelance resumes",
+  "name": "careerpathos",
+  "version": "2.0.0",
+  "description": "CareerPathOS — AI-powered Career & Resume Intelligence Platform for Students and Professionals",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

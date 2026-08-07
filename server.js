@@ -188,7 +188,7 @@ function parseResumeText(text) {
 // ============================================
 
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'AI Resume Builder API is running', version: '2.0' });
+    res.json({ status: 'ok', message: 'CareerPathOS API is running', version: '2.0' });
 });
 
 app.post('/api/generate-resume', async (req, res) => {
@@ -376,7 +376,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`\n🚀 AI Resume Builder v2.0 running on http://localhost:${PORT}`);
+    console.log(`\n🚀 CareerPathOS v2.0 running on http://localhost:${PORT}`);
     console.log(`📄 Open http://localhost:${PORT} in your browser\n`);
 });
 
